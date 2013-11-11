@@ -1,7 +1,5 @@
 package fr.hoteia.qalingo.core.service.pojo.impl;
 
-import static fr.hoteia.qalingo.core.pojo.util.mapper.PojoUtil.mapAll;
-
 import java.util.List;
 
 import org.dozer.Mapper;
@@ -21,6 +19,7 @@ import fr.hoteia.qalingo.core.pojo.catalog.CatalogCategoryPojo;
 import fr.hoteia.qalingo.core.pojo.catalog.CatalogPojo;
 import fr.hoteia.qalingo.core.pojo.product.ProductMarketingPojo;
 import fr.hoteia.qalingo.core.pojo.product.ProductSkuPojo;
+import fr.hoteia.qalingo.core.pojo.util.mapper.PojoUtil;
 import fr.hoteia.qalingo.core.service.CatalogService;
 import fr.hoteia.qalingo.core.service.pojo.CatalogPojoService;
 
@@ -28,10 +27,10 @@ import fr.hoteia.qalingo.core.service.pojo.CatalogPojoService;
 @Transactional(readOnly = true)
 public class CatalogPojoServiceImpl implements CatalogPojoService {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    protected Mapper mapper;
+    protected Mapper dozerBeanMapper;
     
     @Autowired
     protected CatalogService catalogService;
@@ -39,53 +38,53 @@ public class CatalogPojoServiceImpl implements CatalogPojoService {
     @Override
     public List<CatalogPojo> getAllCatalogMasters() {
         final List<CatalogMaster> allCatalogMasters = catalogService.findAllCatalogMasters();
-        LOG.debug("Found {} catalogs", allCatalogMasters.size());
-        return mapAll(mapper, allCatalogMasters, CatalogPojo.class);
+        logger.debug("Found {} catalogs", allCatalogMasters.size());
+        return PojoUtil.mapAll(dozerBeanMapper, allCatalogMasters, CatalogPojo.class);
     }
 
     @Override
     public CatalogPojo getCatalogById(String catalogId) {
         final CatalogMaster catalog = catalogService.getProductCatalogById(catalogId);
-        LOG.debug("Found catalog {} for id {}", catalog, catalogId);
-        return mapper.map(catalog, CatalogPojo.class);
+        logger.debug("Found catalog {} for id {}", catalog, catalogId);
+        return dozerBeanMapper.map(catalog, CatalogPojo.class);
     }
     
     @Override
     public CatalogPojo getCatalog(CatalogMaster catalogMaster) {
-        final CatalogPojo catalogPojo = mapper.map(catalogMaster, CatalogPojo.class);
-        LOG.debug("Load {} catalog", catalogMaster.getCode());
+        final CatalogPojo catalogPojo = dozerBeanMapper.map(catalogMaster, CatalogPojo.class);
+        logger.debug("Load {} catalog", catalogMaster.getCode());
         return catalogPojo;
     }
 
     @Override
     public CatalogPojo getCatalog(CatalogVirtual catalogVirtual) {
-        final CatalogPojo catalogPojo = mapper.map(catalogVirtual, CatalogPojo.class);
-        LOG.debug("Load {} catalog", catalogVirtual.getCode());
+        final CatalogPojo catalogPojo = dozerBeanMapper.map(catalogVirtual, CatalogPojo.class);
+        logger.debug("Load {} catalog", catalogVirtual.getCode());
         return catalogPojo;
     }
     
     public CatalogCategoryPojo buildCatalogCategory(final CatalogCategoryMaster catalogCategory) {
-        final CatalogCategoryPojo catalogCategoryPojo = mapper.map(catalogCategory, CatalogCategoryPojo.class);
-        LOG.debug("Load {} category", catalogCategory.getCode());
+        final CatalogCategoryPojo catalogCategoryPojo = dozerBeanMapper.map(catalogCategory, CatalogCategoryPojo.class);
+        logger.debug("Load {} category", catalogCategory.getCode());
         return catalogCategoryPojo;
     }
     
     public CatalogCategoryPojo buildCatalogCategory(final CatalogCategoryVirtual catalogCategory) {
-        final CatalogCategoryPojo catalogCategoryPojo = mapper.map(catalogCategory, CatalogCategoryPojo.class);
-        LOG.debug("Load {} category", catalogCategory.getCode());
+        final CatalogCategoryPojo catalogCategoryPojo = dozerBeanMapper.map(catalogCategory, CatalogCategoryPojo.class);
+        logger.debug("Load {} category", catalogCategory.getCode());
         return catalogCategoryPojo;
     }
     
     public ProductMarketingPojo buildProductMarketing(final ProductMarketing productMarketing) {
-        final ProductMarketingPojo productMarketingPojo = mapper.map(productMarketing, ProductMarketingPojo.class);
-        LOG.debug("Load {} product marketing", productMarketing.getCode());
+        final ProductMarketingPojo productMarketingPojo = dozerBeanMapper.map(productMarketing, ProductMarketingPojo.class);
+        logger.debug("Load {} product marketing", productMarketing.getCode());
         return productMarketingPojo;
     }
     
     
     public ProductSkuPojo buildProductSku(final ProductSku productSku) {
-        final ProductSkuPojo productSkuPojo = mapper.map(productSku, ProductSkuPojo.class);
-        LOG.debug("Load {} sku", productSku.getCode());
+        final ProductSkuPojo productSkuPojo = dozerBeanMapper.map(productSku, ProductSkuPojo.class);
+        logger.debug("Load {} sku", productSku.getCode());
         return productSkuPojo;
     }
     

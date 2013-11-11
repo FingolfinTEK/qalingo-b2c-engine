@@ -23,8 +23,9 @@ public class EngineSettingViewBean extends AbstractViewBean implements Serializa
 	protected String name;
 	protected String description;
 	protected String code;
+	protected String defaultValue;
 	
-	protected String engineSettingDetailsUrl;
+	protected String detailsUrl;
 	
 	protected List<EngineSettingValueViewBean> engineSettingValues = new ArrayList<EngineSettingValueViewBean>();
 
@@ -52,14 +53,22 @@ public class EngineSettingViewBean extends AbstractViewBean implements Serializa
 		this.code = code;
 	}
 
-	public String getEngineSettingDetailsUrl() {
-		return engineSettingDetailsUrl;
+	public String getDefaultValue() {
+        return defaultValue;
+    }
+	
+	public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+	
+	public String getDetailsUrl() {
+		return detailsUrl;
 	}
 
-	public void setEngineSettingDetailsUrl(String engineSettingDetailsUrl) {
-		this.engineSettingDetailsUrl = engineSettingDetailsUrl;
+	public void setDetailsUrl(String detailsUrl) {
+		this.detailsUrl = detailsUrl;
 	}
-
+	
 	public List<EngineSettingValueViewBean> getEngineSettingValues() {
 		return engineSettingValues;
 	}
@@ -68,5 +77,4 @@ public class EngineSettingViewBean extends AbstractViewBean implements Serializa
 		this.engineSettingValues = engineSettingValues;
 	}
 
-	
 }

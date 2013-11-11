@@ -63,7 +63,7 @@ INSERT INTO teco_attribute_definition
 (id, name, description, code, attribute_type, object_type, localizable, global, planned, version)
 VALUES 
 (1, 'Market Area Email From Address (Generic)', 'Market Area Email From Address (Generic)', 'MARKET_AREA_EMAIL_FROM_ADDRESS', 1, 8, 0, 0, 0, 1),
-(1, 'Market Area Email From Name (Generic)', 'Market Area Email From Name(Generic)', 'MARKET_AREA_EMAIL_FROM_NAME', 1, 8, 0, 0, 0, 1),
+(2, 'Market Area Email From Name (Generic)', 'Market Area Email From Name(Generic)', 'MARKET_AREA_EMAIL_FROM_NAME', 1, 8, 0, 0, 0, 1),
 (3, 'Market Area Email Contact (To)', 'Market Area Email Contact (To)', 'MARKET_AREA_EMAIL_CONTACT', 1, 8, 0, 0, 0, 1),
 (5, 'Market Area Domaine name', 'Market Area Domaine name', 'MARKET_AREA_DOMAIN_NAME', 1, 8, 0, 0, 0, 1),
 (6, 'Market Area Share Option', 'Market Area Share Option', 'MARKET_AREA_SHARE_OPTIONS', 1, 8, 0, 0, 0, 1),
@@ -82,7 +82,7 @@ VALUES
 INSERT INTO teco_engine_setting 
 (id, name, description, code, default_value, version)
 VALUES 
-(10, 'Environment Staging Mode enabled setting', 'Environment Staging Mode enabled setting', 'ENVIRONMENT_STAGING_MODE_ENABLED', 'false', 1);
+(10, 'Environment Staging Mode enabled setting', 'Environment Staging Mode enabled setting', 'ENVIRONMENT_STAGING_MODE_ENABLED', 'false', 1),
 (11, 'Environment Type setting', 'Environment Type setting', 'ENVIRONMENT_TYPE', 'REEL', 1);
 
 -- Save Email file mirroring setting
@@ -198,15 +198,15 @@ VALUES
 INSERT INTO teco_engine_setting 
 (id, name, description, code, default_value, version)
 VALUES 
-(1050, 'Setting items by list ', 'Setting items by list', 'COUNT_ITEM_BY_PAGE', '20', 1);
+(1050, 'Setting items by list ', 'Setting items by list', 'COUNT_ITEM_BY_PAGE', '15', 1);
 
 INSERT INTO teco_engine_setting_value  
 (id, context, value, engine_setting_id)
 VALUES 
-(1050, 'BO_TECHNICAL_ENGINE_SETTING_LIST',  '20', 1050),
-(1051, 'BO_TECHNICAL_USER_LIST',  '20', 1050),
-(1052, 'BO_TECHNICAL_CACHE_LIST',  '20', 1050),
-(1053, 'BO_TECHNICAL_BATCH_LIST',  '20', 1050);
+(1050, 'BO_TECHNICAL_ENGINE_SETTING_LIST',  '15', 1050),
+(1051, 'BO_TECHNICAL_USER_LIST',  '15', 1050),
+(1052, 'BO_TECHNICAL_CACHE_LIST',  '15', 1050),
+(1053, 'BO_TECHNICAL_BATCH_LIST',  '15', 1050);
 
 -- MarketArea support checkout as guest settings
 INSERT INTO teco_engine_setting 

@@ -4,9 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hoteia.tools.scribe.mapping.oauth.twitter.json.pojo.UserPojo;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.TwitterApi;
@@ -23,6 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import fr.hoteia.qalingo.core.domain.AttributeDefinition;
 import fr.hoteia.qalingo.core.domain.Customer;
 import fr.hoteia.qalingo.core.domain.CustomerAttribute;
@@ -31,6 +31,7 @@ import fr.hoteia.qalingo.core.domain.EngineSettingValue;
 import fr.hoteia.qalingo.core.domain.enumtype.CustomerNetworkOrigin;
 import fr.hoteia.qalingo.core.domain.enumtype.FoUrls;
 import fr.hoteia.qalingo.core.domain.enumtype.OAuthType;
+import fr.hoteia.qalingo.core.mapper.JsonMapper;
 import fr.hoteia.qalingo.core.pojo.RequestData;
 import fr.hoteia.qalingo.core.security.util.SecurityUtil;
 import fr.hoteia.qalingo.core.service.AttributeService;
@@ -41,14 +42,17 @@ import fr.hoteia.qalingo.core.service.AttributeService;
 @Controller("callBackTwitterController")
 public class CallBackTwitterController extends AbstractOAuthFrontofficeController {
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	protected AttributeService attributeService;
 	
 	@Autowired
     protected SecurityUtil securityUtil;
-	
+
+    @Autowired
+    protected JsonMapper jsonMapper;
+    
 	@RequestMapping("/callback-oauth-twitter.html*")
 	public ModelAndView callBackTwitter(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
 		final RequestData requestData = requestUtil.getRequestData(request);
@@ -99,16 +103,16 @@ public class CallBackTwitterController extends AbstractOAuthFrontofficeControlle
 					    if(responseCode == 200){
 					    	handleAuthenticationData(request, response, requestData, OAuthType.TWITTER, responseBody);
 					    } else {
-							LOG.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
+							logger.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
 					    }
 					} else {
-						LOG.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
+						logger.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
 					}
 					
 			    }
 					
 			} catch (Exception e) {
-				LOG.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
+				logger.error("Callback With " + OAuthType.TWITTER.name() + " failed!");
 			}
 		}
 		
@@ -121,14 +125,13 @@ public class CallBackTwitterController extends AbstractOAuthFrontofficeControlle
 	}
 	
 	protected void handleAuthenticationData(HttpServletRequest request, HttpServletResponse response, RequestData requestData, OAuthType type, String jsonData) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
 		UserPojo userPojo = null;
 		try {
-			userPojo = mapper.readValue(jsonData, UserPojo.class);
+			userPojo = jsonMapper.getJsonMapper().readValue(jsonData, UserPojo.class);
 		} catch (JsonGenerationException e) {
-			LOG.error(e.getMessage());
+			logger.error(e.getMessage());
 		} catch (JsonMappingException e) {
-			LOG.error(e.getMessage());
+			logger.error(e.getMessage());
 		}
 		if(userPojo != null){
 			// TWITTER DOESN'T WANT TO SHARE EMAIL -> WE DON'T EXPOSE THIS CONNECT OPTION - WITHOUT EMAIL WE WILL SAVE DUPLICATES WITH CORE CREATE ACCOUNT PROCESS 

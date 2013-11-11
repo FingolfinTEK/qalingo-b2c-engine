@@ -22,7 +22,6 @@ import fr.hoteia.qalingo.core.domain.CatalogVirtual;
 import fr.hoteia.qalingo.core.domain.CurrencyReferential;
 import fr.hoteia.qalingo.core.domain.Customer;
 import fr.hoteia.qalingo.core.domain.EngineSetting;
-import fr.hoteia.qalingo.core.domain.EngineSettingValue;
 import fr.hoteia.qalingo.core.domain.Localization;
 import fr.hoteia.qalingo.core.domain.Market;
 import fr.hoteia.qalingo.core.domain.MarketArea;
@@ -41,8 +40,6 @@ import fr.hoteia.qalingo.web.mvc.viewbean.CatalogViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.CommonViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.CurrencyReferentialViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.CustomerViewBean;
-import fr.hoteia.qalingo.web.mvc.viewbean.EngineSettingDetailsViewBean;
-import fr.hoteia.qalingo.web.mvc.viewbean.EngineSettingValueEditViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.EngineSettingViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.FooterMenuViewBean;
 import fr.hoteia.qalingo.web.mvc.viewbean.GlobalSearchViewBean;
@@ -90,17 +87,17 @@ public interface ViewBeanFactory {
 	
 	RetailerViewBean buildRetailerViewBean(RequestData requestData, Retailer retailer) throws Exception;
 	
-	CatalogViewBean buildMasterCatalogViewBean(RequestData requestData, CatalogMaster catalogVirtual, List<CatalogCategoryMaster> productCategories) throws Exception;
+	CatalogViewBean buildMasterCatalogViewBean(RequestData requestData, CatalogMaster catalogVirtual, List<CatalogCategoryMaster> catalogCategories) throws Exception;
 
-	CatalogViewBean buildVirtualCatalogViewBean(RequestData requestData, CatalogVirtual catalogVirtual, List<CatalogCategoryVirtual> productCategories) throws Exception;
+	CatalogViewBean buildVirtualCatalogViewBean(RequestData requestData, CatalogVirtual catalogVirtual, List<CatalogCategoryVirtual> catalogCategories) throws Exception;
 
-	List<CatalogCategoryViewBean> buildMasterProductCategoryViewBeans(RequestData requestData, List<CatalogCategoryMaster> productCategories, boolean fullPopulate) throws Exception;
+	List<CatalogCategoryViewBean> buildMasterCatalogCategoryViewBeans(RequestData requestData, List<CatalogCategoryMaster> catalogCategories, boolean fullPopulate) throws Exception;
 
-	List<CatalogCategoryViewBean> buildVirtualProductCategoryViewBeans(RequestData requestData, List<CatalogCategoryVirtual> productCategories, boolean fullPopulate) throws Exception;
+	List<CatalogCategoryViewBean> buildVirtualCatalogCategoryViewBeans(RequestData requestData, List<CatalogCategoryVirtual> catalogCategories, boolean fullPopulate) throws Exception;
 	
-	CatalogCategoryViewBean buildMasterProductCategoryViewBean(RequestData requestData, CatalogCategoryMaster productCategory, boolean fullPopulate) throws Exception;
+	CatalogCategoryViewBean buildMasterCatalogCategoryViewBean(RequestData requestData, CatalogCategoryMaster catalogCategory, boolean fullPopulate) throws Exception;
 
-	CatalogCategoryViewBean buildVirtualProductCategoryViewBean(RequestData requestData, CatalogCategoryVirtual productCategory, boolean fullPopulate) throws Exception;
+	CatalogCategoryViewBean buildVirtualCatalogCategoryViewBean(RequestData requestData, CatalogCategoryVirtual catalogCategory, boolean fullPopulate) throws Exception;
 
 	List<ProductMarketingViewBean> buildProductMarketingViewBeans(RequestData requestData, List<ProductMarketing> productMarketings, boolean withDependency) throws Exception;
 	
@@ -132,10 +129,6 @@ public interface ViewBeanFactory {
 	
 	EngineSettingViewBean buildEngineSettingViewBean(RequestData requestData, EngineSetting engineSetting) throws Exception;
 	
-	EngineSettingDetailsViewBean buildEngineSettingDetailsViewBean(RequestData requestData) throws Exception;
-	
-	EngineSettingValueEditViewBean buildEngineSettingValueEditViewBean(RequestData requestData, EngineSettingValue engineSettingValue) throws Exception;
-
 	List<BatchViewBean> buildBatchViewBeans(RequestData requestData, List<BatchProcessObject> batchProcessObjects) throws Exception;
 	
 	BatchViewBean buildBatchViewBean(RequestData requestData, BatchProcessObject batchProcessObject) throws Exception;

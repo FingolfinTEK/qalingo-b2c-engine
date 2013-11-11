@@ -30,10 +30,10 @@ import fr.hoteia.qalingo.core.service.pojo.StorePojoService;
 @Transactional(readOnly = true)
 public class StorePojoServiceImpl implements StorePojoService {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    protected Mapper mapper;
+    @Autowired 
+    private Mapper dozerBeanMapper;
     
     @Autowired 
     private RetailerService retailerService;
@@ -41,21 +41,21 @@ public class StorePojoServiceImpl implements StorePojoService {
     @Override
     public List<StorePojo> getAllStores() {
         List<Store> stores = retailerService.findStores();
-        LOG.debug("Found {} stores", stores.size());
-        return mapAll(mapper, stores, StorePojo.class);
+        logger.debug("Found {} stores", stores.size());
+        return mapAll(dozerBeanMapper, stores, StorePojo.class);
     }
 
     @Override
     public StorePojo getStoreById(final String id) {
         Store store = retailerService.getStoreById(id);
-        LOG.debug("Found {} store for id {}", store, id);
-        return store == null ? null : mapper.map(store, StorePojo.class);
+        logger.debug("Found {} store for id {}", store, id);
+        return store == null ? null : dozerBeanMapper.map(store, StorePojo.class);
     }
 
     @Override
     public void saveOrUpdate(final StorePojo storeJsonBean) {
-        Store store = mapper.map(storeJsonBean, Store.class);
-        LOG.info("Saving store {}", store);
+        Store store = dozerBeanMapper.map(storeJsonBean, Store.class);
+        logger.info("Saving store {}", store);
         retailerService.saveOrUpdateStore(store);
     }
 

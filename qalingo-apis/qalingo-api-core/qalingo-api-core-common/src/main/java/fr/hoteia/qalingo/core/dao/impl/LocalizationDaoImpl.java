@@ -25,7 +25,7 @@ import fr.hoteia.qalingo.core.domain.Localization;
 @Repository("localizationDao")
 public class LocalizationDaoImpl extends AbstractGenericDaoImpl implements LocalizationDao {
 
-	private final Logger LOG = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public Localization getLocalizationById(Long localizationId) {
 		return em.find(Localization.class, localizationId);
@@ -46,7 +46,7 @@ public class LocalizationDaoImpl extends AbstractGenericDaoImpl implements Local
 
 	public List<Localization> findLocalizations() {
 		Session session = (Session) em.getDelegate();
-		String sql = "FROM Localization ORDER BY localeCode";
+		String sql = "FROM Localization ORDER BY language";
 		Query query = session.createQuery(sql);
 		List<Localization> localizations = (List<Localization>) query.list();
 		return localizations;

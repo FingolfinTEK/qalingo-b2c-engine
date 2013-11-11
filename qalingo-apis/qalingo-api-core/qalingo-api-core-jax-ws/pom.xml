@@ -23,6 +23,7 @@
     </properties>
 
     <build>
+		<finalName>qalingo-api-core-xml-binding</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -85,11 +86,11 @@
     <dependencies>
         <!-- Qalingo libs -->
         <dependency>
-            <groupId>fr.hoteia.qalingo</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>qalingo-api-core-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>fr.hoteia.qalingo</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>qalingo-api-core-xml-binding</artifactId>
         </dependency>
 

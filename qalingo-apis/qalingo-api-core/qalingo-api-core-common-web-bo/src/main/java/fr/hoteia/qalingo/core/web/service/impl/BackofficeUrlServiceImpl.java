@@ -18,13 +18,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.hoteia.qalingo.core.Constants;
 import fr.hoteia.qalingo.core.RequestConstants;
+import fr.hoteia.qalingo.core.domain.AbstractPaymentGateway;
+import fr.hoteia.qalingo.core.domain.AbstractRuleReferential;
+import fr.hoteia.qalingo.core.domain.Asset;
+import fr.hoteia.qalingo.core.domain.CatalogCategoryMaster;
+import fr.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
+import fr.hoteia.qalingo.core.domain.Customer;
+import fr.hoteia.qalingo.core.domain.EngineSetting;
+import fr.hoteia.qalingo.core.domain.EngineSettingValue;
 import fr.hoteia.qalingo.core.domain.Localization;
 import fr.hoteia.qalingo.core.domain.Market;
 import fr.hoteia.qalingo.core.domain.MarketArea;
 import fr.hoteia.qalingo.core.domain.MarketPlace;
+import fr.hoteia.qalingo.core.domain.Order;
+import fr.hoteia.qalingo.core.domain.ProductMarketing;
+import fr.hoteia.qalingo.core.domain.ProductSku;
 import fr.hoteia.qalingo.core.domain.Retailer;
+import fr.hoteia.qalingo.core.domain.Shipping;
+import fr.hoteia.qalingo.core.domain.User;
 import fr.hoteia.qalingo.core.domain.enumtype.BoUrls;
 import fr.hoteia.qalingo.core.pojo.RequestData;
 import fr.hoteia.qalingo.core.web.mvc.service.impl.AbstractUrlServiceImpl;
@@ -34,102 +46,8 @@ import fr.hoteia.qalingo.core.web.service.BackofficeUrlService;
 @Transactional
 public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements BackofficeUrlService {
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public String buildProductMasterCategoryDetailsUrl(String productCategoryCode) throws Exception {
-		return buildPrefix() + "/catalog-master-category-details.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-	}
-	
-	public String buildProductVirtualCategoryDetailsUrl(String productCategoryCode) throws Exception {
-		return buildPrefix() + "/catalog-virtual-category-details.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-	}
-	
-	public String buildAddMasterProductCategoryUrl(String productCategoryCode) throws Exception {
-		if(StringUtils.isNotEmpty(productCategoryCode)){
-			return buildPrefix() + "/add-master-catalog-category.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-		} else {
-			return buildPrefix() + "/add-master-catalog-category.html";
-		}
-	}
-
-	public String buildAddVirtualProductCategoryUrl(String productCategoryCode) throws Exception {
-		if(StringUtils.isNotEmpty(productCategoryCode)){
-			return buildPrefix() + "/add-virtual-catalog-category.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-		} else {
-			return buildPrefix() + "/add-virtual-catalog-category.html";
-		}
-	}
-	
-	public String buildMasterProductCategoryEditUrl(String productCategoryCode) throws Exception {
-		return buildPrefix() + "/catalog-master-category-edit.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-	}
-	
-	public String buildVirtualProductCategoryEditUrl(String productCategoryCode) throws Exception {
-		return buildPrefix() + "/catalog-virtual-category-edit.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE + "=" + handleString(productCategoryCode);
-	}
-	
-	public String buildProductMarketingDetailsUrl(String productMarketingCode) throws Exception {
-		return buildPrefix() + "/product-marketing-details.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_MARKETING_CODE + "=" + handleString(productMarketingCode);
-	}
-	
-	public String buildProductMarketingEditUrl(String productMarketingCode) throws Exception {
-		return buildPrefix() + "/product-marketing-edit.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_MARKETING_CODE + "=" + handleString(productMarketingCode);
-	}
-	
-	public String buildProductSkuDetailsUrl(String productSkuCode) throws Exception {
-		return buildPrefix() + "/product-sku-details.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_SKU_CODE + "=" + handleString(productSkuCode);
-	}
-	
-	public String buildProductSkuEditUrl(String productSkuCode) throws Exception {
-		return buildPrefix() + "/product-sku-edit.html?" + RequestConstants.REQUEST_PARAMETER_PRODUCT_SKU_CODE + "=" + handleString(productSkuCode);
-	}
-	
-	public String buildAssetDetailsUrl(String assetCode) throws Exception {
-		return buildPrefix() + "/asset-details.html?" + RequestConstants.REQUEST_PARAMETER_ASSET_CODE + "=" + handleString(assetCode);
-	}
-	
-	public String buildAssetEditUrl(String assetCode) throws Exception {
-		return buildPrefix() + "/asset-edit.html?" + RequestConstants.REQUEST_PARAMETER_ASSET_CODE + "=" + handleString(assetCode);
-	}
-	
-	public String buildRuleDetailsUrl(String promotionCode) throws Exception {
-		return buildPrefix() + "/rule-details.html?" + RequestConstants.REQUEST_PARAMETER_RULE_CODE + "=" + handleString(promotionCode);
-	}
-	
-	public String buildRuleEditUrl(String promotionCode) throws Exception {
-		return buildPrefix() + "/rule-edit.html?" + RequestConstants.REQUEST_PARAMETER_RULE_CODE + "=" + handleString(promotionCode);
-	}
-	
-	public String buildShippingDetailsUrl(String shippingCode) throws Exception {
-		return buildPrefix() + "/shipping-details.html?" + RequestConstants.REQUEST_PARAMETER_SHIPPING_CODE + "=" + handleString(shippingCode);
-	}
-	
-	public String buildShippingEditUrl(String shippingCode) throws Exception {
-		return buildPrefix() + "/shipping-edit.html?" + RequestConstants.REQUEST_PARAMETER_SHIPPING_CODE + "=" + handleString(shippingCode);
-	}
-	
-	public String buildOrderDetailsUrl(String orderNum) throws Exception {
-		return buildPrefix() + "/order-details.html?" + RequestConstants.REQUEST_PARAMETER_ORDER_CODE + "=" + handleString(orderNum);
-	}
-	
-	public String buildOrderEditUrl(String orderNum) throws Exception {
-		return buildPrefix() + "/order-edit.html?" + RequestConstants.REQUEST_PARAMETER_ORDER_CODE + "=" + handleString(orderNum);
-	}
-	
-	public String buildCustomerDetailsUrl(String customerCode) throws Exception {
-		return buildPrefix() + "/customer-details.html?" + RequestConstants.REQUEST_PARAMETER_CUSTOMER_CODE + "=" + handleString(customerCode);
-	}
-	
-	public String buildCustomerEditUrl(String customerCode) throws Exception {
-		return buildPrefix() + "/customer-edit.html?" + RequestConstants.REQUEST_PARAMETER_CUSTOMER_CODE + "=" + handleString(customerCode);
-	}
-	
-	protected String buildPrefix(){
-		return Constants.SPRING_URL_PATH;
-	}
-	
-	// KEEP
-
 	public String buildChangeLanguageUrl(final RequestData requestData) throws Exception {
 		final MarketPlace marketPlace = requestData.getMarketPlace();
 		final Market market = requestData.getMarket();
@@ -175,10 +93,63 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
         	if(params != null){
                 for (Object param : params) {
                     if (param == null) continue;
-                    if (param instanceof Map) {
+                    if (param instanceof CatalogCategoryMaster) {
+                        CatalogCategoryMaster catalogCategoryMaster = (CatalogCategoryMaster) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE, handleParamValue(catalogCategoryMaster.getCode()));
+                        break;
+                    } else if (param instanceof CatalogCategoryVirtual) {
+                        CatalogCategoryVirtual catalogCategoryVirtual = (CatalogCategoryVirtual) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE, handleParamValue(catalogCategoryVirtual.getId().toString()));
+                        break;
+                    } else if (param instanceof ProductMarketing) {
+                        ProductMarketing productMarketing = (ProductMarketing) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_MARKETING_CODE, handleParamValue(productMarketing.getId().toString()));
+                        break;
+                    } else if (param instanceof ProductSku) {
+                        ProductSku productSku = (ProductSku) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_SKU_CODE, handleParamValue(productSku.getId().toString()));
+                        break;
+                    } else if (param instanceof Asset) {
+                        Asset asset = (Asset) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ASSET_CODE, handleParamValue(asset.getId().toString()));
+                        break;
+                    } else if (param instanceof AbstractRuleReferential) {
+                        AbstractRuleReferential rule = (AbstractRuleReferential) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_RULE_CODE, handleParamValue(rule.getId().toString()));
+                        break;
+                    } else if (param instanceof Shipping) {
+                        Shipping shipping = (Shipping) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_SHIPPING_CODE, handleParamValue(shipping.getId().toString()));
+                        break;
+                    } else if (param instanceof Order) {
+                        Order order = (Order) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ORDER_CODE, handleParamValue(order.getId().toString()));
+                        break;
+                    } else if (param instanceof Customer) {
+                        Customer customer = (Customer) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_CUSTOMER_CODE, handleParamValue(customer.getId().toString()));
+                        break;
+                    } else if (param instanceof EngineSetting) {
+                        EngineSetting engineSetting = (EngineSetting) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_ID, handleParamValue(engineSetting.getId().toString()));
+                        break;
+                    } else if (param instanceof EngineSettingValue) {
+                        EngineSettingValue engineSettingValue = (EngineSettingValue) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_VALUE_ID, handleParamValue(engineSettingValue.getId().toString()));
+                        break;
+                    } else if (param instanceof AbstractPaymentGateway) {
+                        AbstractPaymentGateway paymentGateway = (AbstractPaymentGateway) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PAYMENT_GATEWAY_ID, handleParamValue(paymentGateway.getId().toString()));
+                        break;
+                    } else if (param instanceof User) {
+                        User user = (User) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_USER_ID, handleParamValue(user.getId().toString()));
+                        break;
+                    } else if (param instanceof Map) {
                         getParams = (Map<String, String>) param;
+                        break;
                     } else {
-                        LOG.warn("Unknowned url parameter : [{}]", param);
+                        logger.warn("Unknowned url parameter : [{}]", param);
                     }
                 }    		
         	}
@@ -190,7 +161,7 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
         	urlStr = urlStr + url.getUrl();
 	        
         } catch (Exception e) {
-        	LOG.error("Can't build Url!", e);
+        	logger.error("Can't build Url!", e);
         }
     	return handleUrlParameters(urlStr, urlParams, getParams);
     }

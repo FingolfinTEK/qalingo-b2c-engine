@@ -20,6 +20,10 @@
 		<root.basedir>${project.parent.parent.parent.basedir}</root.basedir> 
 	</properties>
 
+	<build>
+		<finalName>qalingo-api-core-common</finalName>
+	</build>
+	
 	<dependencies>
 		<!-- Commons libs -->
 		<dependency>
@@ -97,6 +101,16 @@
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
 		
+		<!-- AspectJ framework -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+		
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -127,11 +141,6 @@
 			<artifactId>ehcache-core</artifactId>
 		</dependency>
 		
-		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>clickstream</artifactId>
-		</dependency>
-		
 		<!-- Email -->
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -160,14 +169,24 @@
             </exclusions>
         </dependency>
 		
-		<!-- JSON -->
+		<!-- JACKSON Libs : JSON -->
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+		</dependency>
+		
+		<!-- JACKSON Libs : XML -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
 		
 		<!-- Test dependencies -->

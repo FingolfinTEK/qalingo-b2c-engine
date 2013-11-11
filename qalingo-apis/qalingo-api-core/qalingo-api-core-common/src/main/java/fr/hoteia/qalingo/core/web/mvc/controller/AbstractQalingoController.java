@@ -1,5 +1,7 @@
 package fr.hoteia.qalingo.core.web.mvc.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ import fr.hoteia.qalingo.core.web.viewbean.TrackingViewBean;
  */
 public abstract class AbstractQalingoController {
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	protected CoreMessageSource coreMessageSource;
@@ -117,6 +119,17 @@ public abstract class AbstractQalingoController {
 	    }
 		return trackingViewBean;
 	}
+	
+    /**
+     * 
+     */
+    @ModelAttribute(ModelConstants.URL_BACK)
+    protected String initBackUrl(final HttpServletRequest request, final Model model) throws Exception {
+        String url = requestUtil.getCurrentRequestUrl(request);
+        List<String> excludedPatterns = new ArrayList<String>();
+        excludedPatterns.add(url);
+        return requestUtil.getLastRequestUrl(request, excludedPatterns);
+    }
 
 	/**
 	 * 
@@ -153,9 +166,9 @@ public abstract class AbstractQalingoController {
         result.addError(error);
         result.rejectValue(error.getField(), "");
         if(e != null){
-            LOG.error(errorMessage, e);
+            logger.error(errorMessage, e);
         } else {
-            LOG.warn(errorMessage);
+            logger.warn(errorMessage);
         }
     }
 	

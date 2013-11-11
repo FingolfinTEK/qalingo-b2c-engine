@@ -20,10 +20,14 @@
 		<root.basedir>${project.parent.parent.parent.basedir}</root.basedir> 
 	</properties>
 
+	<build>
+		<finalName>qalingo-api-core-security</finalName>
+	</build>
+	
 	<dependencies>
 		<!-- Qalingo libs-->
 		<dependency>
-			<groupId>fr.hoteia.qalingo</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>qalingo-api-core-common</artifactId>
 		</dependency>
 		
@@ -111,11 +115,6 @@
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>clickstream</artifactId>
 		</dependency>
 		
 		<dependency>
