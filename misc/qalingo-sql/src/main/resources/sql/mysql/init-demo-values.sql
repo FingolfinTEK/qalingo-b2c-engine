@@ -96,6 +96,18 @@ INSERT INTO teco_marketplace
 (20, 'Market place 3 = Brand, Area ??', 'MARKPL3', null, 0, 'market place 3 (North America,South America)', 1, 1),
 (30, 'Market place 4 = Brand, Area ??', 'MARKPL4', null, 0, 'market place 4 (ASIA)', 1, 1);
 
+INSERT INTO teco_marketplace_attribute   
+(id, context, string_value, market_place_id, attribute_definition_id)
+VALUES 
+(161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 1, 60),
+(162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 1, 60),
+(1161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 10, 60),
+(1162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 10, 60),
+(1261, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 20, 60),
+(1262, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 20, 60),
+(1361, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 30, 60),
+(1362, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 30, 60);
+
 INSERT INTO teco_market 
 (id, description, code, theme, is_default, name, version, marketplace_id)
  VALUES 
@@ -105,6 +117,7 @@ INSERT INTO teco_market
 (21, 'Market 4 = example South America', 'SAM', null, 0, 'South America', 1, 20),
 (30, 'Market 5 = example Asia', 'ASIA', null, 1, 'Asia', 1, 30);
 
+
 INSERT INTO teco_market_area 
 (id, description, name, code, theme, is_default, version, default_localization_id, market_id, virtual_catalog_id, currency_id, latitude, longitude)
  VALUES 
@@ -113,21 +126,21 @@ INSERT INTO teco_market_area
 (102, 'Market ESP description', 'market area 3 : ESP', 'ESP', null, 1, 1, 3, 10, 102, 1, '40.260', '3.420'),	
 (201, 'Market USA description', 'market area 4 : USA', 'USA', null, 1, 1, 1, 20, 201, 2, '40.000', '-90.000'),
 (202, 'Market CAN description', 'market area 4 : CAN', 'CAN', null, 0, 1, 1, 20, 202, 4, '55.000', '-90.000'),
-(210, 'Market BRA description', 'market area 2 : BRA', 'BRA', null, 1, 1, 9, 21, 210, 2, '-22.570', '-43.120'),
+(210, 'Market BRA description', 'market area 2 : BRA', 'BRA', null, 1, 1, 8, 21, 210, 2, '-22.570', '-43.120'),
 (211, 'Market ARG description', 'market area 2 : ARG', 'ARG', null, 1, 1, 3, 21, 211, 2, '-34.350', '-58.220'),
-(301, 'Market CHN description', 'market area 5 : CHN', 'CHN', null, 0, 1, 7, 30, 301, 5, '121.280', '31.100'),
-(302, 'Market JPN description', 'market area 6 : JPN', 'JPN', null, 1, 1, 8, 30, 302, 6, '35.400', '139.450');
+(301, 'Market CHN description', 'market area 5 : CHN', 'CHN', null, 0, 1, 9, 30, 301, 5, '121.280', '31.100'),
+(302, 'Market JPN description', 'market area 6 : JPN', 'JPN', null, 1, 1, 7, 30, 302, 6, '35.400', '139.450');
 
 /*
 (510, 'BO_BUSINESS',  'bo-business.dev.qalingo.com', 1, 5),
 (511, 'BO_REPORTING', 'bo-reporting.dev.qalingo.com', 1, 5),
 (512, 'BO_TECHNICAL', 'bo-technical.dev.qalingo.com', 1, 5),
-*/
 INSERT INTO teco_market_area_attribute   
 (id, context, string_value, market_area_id, attribute_definition_id)
 VALUES 
 (513, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 1, 5),
 (514, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 1, 5);
+*/
 
 INSERT INTO teco_market_area_attribute   
 (id, context, string_value, market_area_id, attribute_definition_id)
@@ -212,13 +225,13 @@ INSERT INTO teco_catalog_master_category
 (50, 'Category 5 description', 'CATE50', 0, 'Commerce équitable', 1);
 
 INSERT INTO teco_catalog_virtual_category 
-(id, description, code, is_default, business_name, version)
+(id, description, code, is_default, business_name, master_category_id, version)
  VALUES 
-(10, 'Category 1 description', 'CATE10', 0, 'Nouveautés', 1),
-(20, 'Category 2 description', 'CATE20', 0, 'Idées de cadeaux', 1),
-(30, 'Category 3 description', 'CATE30', 1, 'Café', 1),
-(40, 'Category 4 description', 'CATE40', 0, 'Thé', 1),
-(50, 'Category 5 description', 'CATE50', 0, 'Commerce équitable', 1);
+(10, 'Category 1 description', 'CATE10', 0, 'Nouveautés', 10, 1),
+(20, 'Category 2 description', 'CATE20', 0, 'Idées de cadeaux', 20, 1),
+(30, 'Category 3 description', 'CATE30', 1, 'Café', 30, 1),
+(40, 'Category 4 description', 'CATE40', 0, 'Thé', 40, 1),
+(50, 'Category 5 description', 'CATE50', 0, 'Commerce équitable', 50, 1);
 
 INSERT INTO teco_catalog_master_category_master_rel 
 (master_catalog_id, master_category_id)
@@ -357,7 +370,7 @@ INSERT INTO teco_product_marketing
 (4, 'product marketing 4', 'PROD4', 0, 'Produit 4', 1, 20);
 
 INSERT INTO teco_product_marketing_attribute 
-(id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, product_marketting_id, attribute_definition_id, localization_code, market_area_id) 
+(id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, product_marketing_id, attribute_definition_id, localization_code, market_area_id) 
 VALUES 
 (1, null, null, null, null, null, 'PROD1 i18n', 1, 30, null, 1),
 (2, null, null, null, null, null, 'PROD2 i18n', 2, 30, null, 1),
@@ -370,7 +383,9 @@ INSERT INTO teco_product_sku
 (1, 'prod 1 product sku 1', 'SKU11', 1, 'Sku 11', 1, 1), 
 (2, 'prod 1 product sku 2', 'SKU12', 0, 'Sku 12', 1, 1),
 (3, 'prod 1 product sku 3', 'SKU13', 0, 'Sku 13', 1, 1),
-(4, 'prod 2 product sku 1', 'SKU21', 0, 'Sku 21', 1, 2);
+(4, 'prod 2 product sku 1', 'SKU21', 0, 'Sku 21', 1, 2),
+(5, 'prod 3 product sku 1', 'SKU31', 0, 'Sku 31', 1, 3),
+(6, 'prod 4 product sku 1', 'SKU41', 0, 'Sku 41', 1, 4);
 
 INSERT INTO teco_catalog_master_category_product_marketing_rel  
 (master_category_id, product_marketing_id)
@@ -387,6 +402,10 @@ INSERT INTO teco_catalog_virtual_category_product_marketing_rel
 (302, 2), 
 (302, 3),
 (401, 4);
+
+INSERT INTO teco_product_marketing_attribute
+(BOOLEAN_VALUE,IS_GLOBAL,MARKET_AREA_ID,ORDERING,VERSION,ATTRIBUTE_DEFINITION_ID,PRODUCT_MARKETING_ID)
+VALUES (1,0,1,0,1,52,1), (1,0,1,0,1,52,2), (1,0,1,0,1,52,3), (1,0,1,0,1,52,4);
 
 -- PRICE
 
