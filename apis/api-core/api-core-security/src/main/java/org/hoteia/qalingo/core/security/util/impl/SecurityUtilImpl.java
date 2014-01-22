@@ -68,11 +68,12 @@ public class SecurityUtilImpl implements SecurityUtil {
 			SecurityContextHolder.getContext().setAuthentication(authenticatedUser); 
 			request.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext()); 
 		
-			EngineEcoSession engineEcoSession = requestUtil.getCurrentEcoSession(request);
-			engineEcoSession.setCurrentCustomer(customer);
-			engineEcoSession.getCart().setCustomerId(customer.getId());
-			engineSessionService.saveOrUpdateEngineEcoSession(engineEcoSession);
-			
+			EngineEcoSession engineEcoSessionWithTransientValues = requestUtil.getCurrentEcoSession(request);
+			engineEcoSessionWithTransientValues.setCurrentCustomer(customer);
+			engineEcoSessionWithTransientValues.getCart().setCustomerId(customer.getId());
+			engineEcoSessionWithTransientValues.getCart().setBillingAddressId(customer.getDefaultBillingAddressId());
+			engineEcoSessionWithTransientValues.getCart().setShippingAddressId(customer.getDefaultShippingAddressId());
+			engineSessionService.updateAndSynchronizeEngineEcoSession(engineEcoSessionWithTransientValues);
 		} catch (Exception e) {
 			logger.error("", e);
 		}

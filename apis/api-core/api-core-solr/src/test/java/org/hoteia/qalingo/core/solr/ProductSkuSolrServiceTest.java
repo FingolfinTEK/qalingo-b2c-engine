@@ -1,11 +1,16 @@
 package org.hoteia.qalingo.core.solr;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.hoteia.qalingo.core.domain.MarketArea;
 import org.hoteia.qalingo.core.domain.ProductSku;
+import org.hoteia.qalingo.core.domain.ProductSkuPrice;
+import org.hoteia.qalingo.core.domain.Retailer;
 import org.hoteia.qalingo.core.solr.response.ProductSkuResponseBean;
 import org.hoteia.qalingo.core.solr.service.ProductSkuSolrService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,22 +29,44 @@ public class ProductSkuSolrServiceTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     
 	@Autowired
-	protected ProductSkuSolrService productSolrService; 
+	protected ProductSkuSolrService productSkuSolrService; 
 
 	protected ProductSku productSku;
 
 	protected ProductSkuResponseBean responseBean;
 
+    private MarketArea marketArea;
+    private Retailer retailer;
+    
+    @Before
+    public void setUp() throws Exception {
+        marketArea = new MarketArea();
+        marketArea.setId(new Long("1"));
+        
+        retailer = new Retailer();
+        retailer.setId(new Long("1"));
+        
+        productSku = new ProductSku();
+        productSku.setId(new Long("1"));
+        productSku.setDefault(true);
+        productSku.setBusinessName("Product Sku");
+        productSku.setDescription("Product Sku ...");
+        productSku.setCode("productSku");
+        ProductSkuPrice productSkuPrice = new ProductSkuPrice();
+        productSkuPrice.setId(new Long("1"));
+        productSkuPrice.setMarketAreaId(new Long("1"));
+        productSkuPrice.setRetailerId(new Long("1"));
+        productSkuPrice.setSalePrice(new BigDecimal("2"));
+        productSku.getPrices().add(productSkuPrice);
+    }
+    
     /**
      * Test Case to check: if required field is blank of null (i.e. id here)
      */
     @Test(expected = IllegalArgumentException.class)
     public void testIndexDataWithBlankID() throws SolrServerException, IOException {
-        productSku = new ProductSku();
-        productSku.setBusinessName("Product Sku");
-        productSku.setDescription("Product Sku ...");
-        productSku.setCode("productSku");
-        productSolrService.addOrUpdateProductSku(productSku);
+        productSku.setId(null);
+        productSkuSolrService.addOrUpdateProductSku(productSku, marketArea, retailer);
         logger.debug("--------------->testFirstIndexData()");
     }
     
@@ -54,7 +81,7 @@ public class ProductSkuSolrServiceTest {
         productSku.setBusinessName("Product Sku");
         productSku.setDescription("Product Sku ...");
         productSku.setCode("productSku");
-        productSolrService.addOrUpdateProductSku(productSku);
+        productSkuSolrService.addOrUpdateProductSku(productSku, marketArea, retailer);
     }
     
 	/**
@@ -63,7 +90,7 @@ public class ProductSkuSolrServiceTest {
     @Test
     public void testSearchId() throws SolrServerException, IOException {
         logger.debug("--------------->Search: Id");
-        responseBean = productSolrService.searchProductSku("id", "", "");
+        responseBean = productSkuSolrService.searchProductSku("id", "", "");
         printData();
     }
     
@@ -73,7 +100,7 @@ public class ProductSkuSolrServiceTest {
     @Test
     public void testSearchIdWithText() throws SolrServerException, IOException {
         logger.debug("--------------->search: code with some text");
-        responseBean = productSolrService.searchProductSku("code", "N", "");
+        responseBean = productSkuSolrService.searchProductSku("code", "N", "");
         printData();
     }
     
@@ -83,7 +110,7 @@ public class ProductSkuSolrServiceTest {
     @Test
     public void testSearchIdWithFacet() throws SolrServerException, IOException {
         logger.debug("--------------->search: code with facet");
-        responseBean = productSolrService.searchProductSku("code", "", "code");
+        responseBean = productSkuSolrService.searchProductSku("code", "", "code");
         printData();
     }
     
@@ -93,7 +120,7 @@ public class ProductSkuSolrServiceTest {
     @Test(expected = org.apache.solr.common.SolrException.class)
     public void testSearch() throws SolrServerException, IOException {
         logger.debug("--------------->Search unknown field");
-        responseBean = productSolrService.searchProductSku("abc", "91", "xyz");
+        responseBean = productSkuSolrService.searchProductSku("abc", "91", "xyz");
         printData();
     }
     
@@ -103,7 +130,7 @@ public class ProductSkuSolrServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testEmptySearch() throws SolrServerException, IOException {
         logger.debug("--------------->Empty Search ");
-        responseBean = productSolrService.searchProductSku("", "", "");
+        responseBean = productSkuSolrService.searchProductSku("", "", "");
         printData();
     }
     
@@ -114,7 +141,7 @@ public class ProductSkuSolrServiceTest {
     @Test
     public void testDefaultSearch() throws SolrServerException, IOException {
         logger.debug("--------------->Default Search ");
-        responseBean = productSolrService.searchProductSku();
+        responseBean = productSkuSolrService.searchProductSku();
         printData();
     }
 

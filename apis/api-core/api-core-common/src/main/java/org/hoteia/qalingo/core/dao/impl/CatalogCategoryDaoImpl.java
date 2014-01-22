@@ -34,7 +34,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	// MASTER
 	
 	public CatalogCategoryMaster getMasterCatalogCategoryById(final Long catalogCategoryId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryMaster.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -45,7 +45,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public CatalogCategoryMaster getMasterCatalogCategoryByCode(final String catalogCategoryCode) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryMaster.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -56,7 +56,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public CatalogCategoryMaster getMasterCatalogCategoryByCode(final Long marketAreaId, final String catalogCategoryCode) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryMaster.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -67,12 +67,12 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public List<CatalogCategoryMaster> findRootCatalogCategories() {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryMaster.class);
 
         addDefaultCatalogCategoryFetch(criteria);
         
-        criteria.add(Restrictions.eq("defaultParentCatalogCategory", null));
-        criteria.addOrder(Order.asc("id"));
+        criteria.add(Restrictions.isNull("defaultParentCatalogCategory"));
+        criteria.addOrder(Order.asc("id"));        
 
         @SuppressWarnings("unchecked")
         List<CatalogCategoryMaster> categories = criteria.list();
@@ -80,7 +80,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public List<CatalogCategoryMaster> findMasterCategoriesByMarketIdAndRetailerId(final Long marketAreaId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryMaster.class);
 
         addDefaultCatalogCategoryFetch(criteria);
         
@@ -91,7 +91,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 		return categories;
 	}
 	
-	public void saveOrUpdateCatalogCategory(CatalogCategoryMaster catalogCategory) {
+	public CatalogCategoryMaster saveOrUpdateCatalogCategory(final CatalogCategoryMaster catalogCategory) {
 		
 		// TODO : Denis : child object dates ?
 		
@@ -99,21 +99,27 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 			catalogCategory.setDateCreate(new Date());
 		}
 		catalogCategory.setDateUpdate(new Date());
-		if(catalogCategory.getId() == null){
-			em.persist(catalogCategory);
-		} else {
-			em.merge(catalogCategory);
-		}
+        if (catalogCategory.getId() != null) {
+            if(em.contains(catalogCategory)){
+                em.refresh(catalogCategory);
+            }
+            CatalogCategoryMaster mergedCatalogCategoryMaster = em.merge(catalogCategory);
+            em.flush();
+            return mergedCatalogCategoryMaster;
+        } else {
+            em.persist(catalogCategory);
+            return catalogCategory;
+        }
 	}
 
-	public void deleteCatalogCategory(CatalogCategoryMaster catalogCategory) {
+	public void deleteCatalogCategory(final CatalogCategoryMaster catalogCategory) {
 		em.remove(catalogCategory);
 	}
 	
 	// VIRTUAL
 	
 	public CatalogCategoryVirtual getVirtualCatalogCategoryById(final Long catalogCategoryId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -124,7 +130,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public CatalogCategoryVirtual getVirtualCatalogCategoryByCode(final String catalogCategoryCode) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -135,7 +141,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public CatalogCategoryVirtual getVirtualCatalogCategoryByCode(final Long marketAreaId, final String catalogCategoryCode) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
         
         addDefaultCatalogCategoryFetch(criteria);
 
@@ -146,11 +152,11 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public List<CatalogCategoryVirtual> findRootCatalogCategories(final Long marketAreaId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
 
         addDefaultCatalogCategoryFetch(criteria);
         
-        criteria.add(Restrictions.eq("defaultParentCatalogCategory", null));
+        criteria.add(Restrictions.isNull("defaultParentCatalogCategory"));
         criteria.addOrder(Order.asc("id"));
 
         @SuppressWarnings("unchecked")
@@ -159,7 +165,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 	}
 	
 	public List<CatalogCategoryVirtual> findCatalogCategories(final Long marketAreaId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
         
         addDefaultCatalogCategoryFetch(criteria);
         
@@ -170,12 +176,13 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 		return categories;
 	}
 	
-	public List<CatalogCategoryVirtual> findCatalogCategoriesByProductMarketingId(final Long marketAreaId, final Long productMarketingId) {
-        Criteria criteria = getSession().createCriteria(CatalogCategoryVirtual.class);
+	public List<CatalogCategoryVirtual> findCatalogCategoriesByProductMarketingCode(final Long marketAreaId, final String productMarketingCode) {
+        Criteria criteria = createDefaultCriteria(CatalogCategoryVirtual.class);
 
         addDefaultCatalogCategoryFetch(criteria);
         
-        criteria.add(Restrictions.eq("productMarketing.code", productMarketingId));
+        criteria.createAlias("productMarketings", "productMarketing", JoinType.LEFT_OUTER_JOIN);
+        criteria.add(Restrictions.eq("productMarketing.code", productMarketingCode));
         
         criteria.addOrder(Order.asc("id"));
 
@@ -184,23 +191,30 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
 		return categories;
 	}
 	
-	public void saveOrUpdateCatalogCategory(CatalogCategoryVirtual catalogCategory) {
+	public CatalogCategoryVirtual saveOrUpdateCatalogCategory(final CatalogCategoryVirtual catalogCategory) {
 		if(catalogCategory.getDateCreate() == null){
 			catalogCategory.setDateCreate(new Date());
 		}
 		catalogCategory.setDateUpdate(new Date());
-		if(catalogCategory.getId() == null){
-			em.persist(catalogCategory);
-		} else {
-			em.merge(catalogCategory);
-		}
+        if (catalogCategory.getId() != null) {
+            if(em.contains(catalogCategory)){
+                em.refresh(catalogCategory);
+            }
+            CatalogCategoryVirtual mergedCatalogCategoryVirtual = em.merge(catalogCategory);
+            em.flush();
+            return mergedCatalogCategoryVirtual;
+        } else {
+            em.persist(catalogCategory);
+            return catalogCategory;
+        }
 	}
 
-	public void deleteCatalogCategory(CatalogCategoryVirtual catalogCategory) {
+	public void deleteCatalogCategory(final CatalogCategoryVirtual catalogCategory) {
 		em.remove(catalogCategory);
 	}
 	
     private void addDefaultCatalogCategoryFetch(Criteria criteria) {
+        
         criteria.setFetchMode("categoryMaster", FetchMode.JOIN);
 
         criteria.setFetchMode("defaultParentCatalogCategory", FetchMode.JOIN);
@@ -218,6 +232,7 @@ public class CatalogCategoryDaoImpl extends AbstractGenericDaoImpl implements Ca
         criteria.setFetchMode("productMarketingAttributes", FetchMode.JOIN);
 
         criteria.setFetchMode("assets", FetchMode.JOIN);
+        
     }
 
 }

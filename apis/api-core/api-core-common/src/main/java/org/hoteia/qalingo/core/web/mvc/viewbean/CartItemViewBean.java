@@ -19,11 +19,13 @@ public class CartItemViewBean extends AbstractViewBean implements Serializable {
 	private static final long serialVersionUID = -7032831815877311774L;
 	
 	protected String skuCode;
+    protected String summaryImage;
 	protected String i18nName;
 	protected int quantity;
-	protected String unitPrice;
-    protected String fees;
-	protected String amount;
+	protected String unitPriceWithCurrencySign;
+    protected String feesWithCurrencySign;
+	protected String amountWithCurrencySign;
+	
 	protected String deleteUrl;
     protected String productDetailsUrl;
 
@@ -34,6 +36,14 @@ public class CartItemViewBean extends AbstractViewBean implements Serializable {
 	public void setSkuCode(String skuCode) {
 		this.skuCode = skuCode;
 	}
+	
+	public String getSummaryImage() {
+        return summaryImage;
+    }
+	
+	public void setSummaryImage(String summaryImage) {
+        this.summaryImage = summaryImage;
+    }
 	
 	public String getI18nName() {
         return i18nName;
@@ -51,31 +61,31 @@ public class CartItemViewBean extends AbstractViewBean implements Serializable {
 		this.quantity = quantity;
 	}
 	
-	public String getUnitPrice() {
-        return unitPrice;
+	public String getUnitPriceWithCurrencySign() {
+        return unitPriceWithCurrencySign;
     }
-	
-	public void setUnitPrice(String unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-	
-	public String getFees() {
-        return fees;
-    }
-	
-	public void setFees(String fees) {
-        this.fees = fees;
-    }
-	
-	public String getAmount() {
-		return amount;
-	}
 
-	public void setAmount(String amount) {
-		this.amount = amount;
-	}
+    public void setUnitPriceWithCurrencySign(String unitPriceWithCurrencySign) {
+        this.unitPriceWithCurrencySign = unitPriceWithCurrencySign;
+    }
 
-	public String getDeleteUrl() {
+    public String getFeesWithCurrencySign() {
+        return feesWithCurrencySign;
+    }
+
+    public void setFeesWithCurrencySign(String feesWithCurrencySign) {
+        this.feesWithCurrencySign = feesWithCurrencySign;
+    }
+
+    public String getAmountWithCurrencySign() {
+        return amountWithCurrencySign;
+    }
+
+    public void setAmountWithCurrencySign(String amountWithCurrencySign) {
+        this.amountWithCurrencySign = amountWithCurrencySign;
+    }
+
+    public String getDeleteUrl() {
 		return deleteUrl;
 	}
 	

@@ -18,6 +18,7 @@ import org.hoteia.qalingo.core.ModelConstants;
 import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.Customer;
 import org.hoteia.qalingo.core.domain.enumtype.FoUrls;
+import org.hoteia.qalingo.core.i18n.enumtype.ScopeCommonMessage;
 import org.hoteia.qalingo.core.i18n.enumtype.ScopeWebMessage;
 import org.hoteia.qalingo.core.pojo.RequestData;
 import org.hoteia.qalingo.core.web.mvc.viewbean.SecurityViewBean;
@@ -43,7 +44,7 @@ public class LoginController extends AbstractMCommerceController {
         final Locale locale = requestData.getLocale();
 
         // SANITY CHECK: Customer logged
-        final Customer currentCustomer = requestUtil.getCurrentCustomer(request);
+        final Customer currentCustomer = requestData.getCustomer();
         if (currentCustomer != null) {
             final String url = urlService.generateUrl(FoUrls.PERSONAL_DETAILS, requestUtil.getRequestData(request));
             return new ModelAndView(new RedirectView(url));
@@ -53,17 +54,43 @@ public class LoginController extends AbstractMCommerceController {
         String error = request.getParameter(RequestConstants.REQUEST_PARAMETER_AUTH_ERROR);
         if (BooleanUtils.toBoolean(error)) {
             model.addAttribute(ModelConstants.AUTH_HAS_FAIL, BooleanUtils.toBoolean(error));
-            model.addAttribute(ModelConstants.AUTH_ERROR_MESSAGE, getSpecificMessage(ScopeWebMessage.AUTH, "login_or_password_are_wrong", locale));
+            model.addAttribute(ModelConstants.AUTH_ERROR_MESSAGE, getCommonMessage(ScopeCommonMessage.AUTH, "login_or_password_are_wrong", locale));
         }
+        
+        return modelAndView;
+    }
+    
+    @RequestMapping(FoUrls.CART_AUTH_URL)
+    public ModelAndView checkoutAuth(final HttpServletRequest request, final Model model) throws Exception {
+        ModelAndViewThemeDevice modelAndView = new ModelAndViewThemeDevice(getCurrentVelocityPath(request), FoUrls.LOGIN.getVelocityPage());
+        final RequestData requestData = requestUtil.getRequestData(request);
+        final Locale locale = requestData.getLocale();
+
+        // SANITY CHECK: Customer logged
+        final Customer currentCustomer = requestData.getCustomer();
+        if (currentCustomer != null) {
+            final String url = urlService.generateUrl(FoUrls.CART_DELIVERY, requestUtil.getRequestData(request));
+            return new ModelAndView(new RedirectView(url));
+        }
+
+        // SANITY CHECK : Param from spring-security
+        String error = request.getParameter(RequestConstants.REQUEST_PARAMETER_AUTH_ERROR);
+        if (BooleanUtils.toBoolean(error)) {
+            model.addAttribute(ModelConstants.AUTH_HAS_FAIL, BooleanUtils.toBoolean(error));
+            model.addAttribute(ModelConstants.AUTH_ERROR_MESSAGE, getCommonMessage(ScopeCommonMessage.AUTH, "login_or_password_are_wrong", locale));
+        }
+        
+        modelAndView.addObject(ModelConstants.CHECKOUT_STEP, 2);
 
         return modelAndView;
     }
 
     @RequestMapping(FoUrls.LOGIN_CHECK_URL)
     public ModelAndView loginCheck(final HttpServletRequest request, final Model model) throws Exception {
+        final RequestData requestData = requestUtil.getRequestData(request);
         ModelAndView modelAndView = new ModelAndView(FoUrls.LOGIN.getVelocityPage());
 
-        final Customer currentCustomer = requestUtil.getCurrentCustomer(request);
+        final Customer currentCustomer = requestData.getCustomer();
         if (currentCustomer != null) {
             final String urlRedirect = urlService.generateUrl(FoUrls.HOME, requestUtil.getRequestData(request));
             return new ModelAndView(new RedirectView(urlRedirect));

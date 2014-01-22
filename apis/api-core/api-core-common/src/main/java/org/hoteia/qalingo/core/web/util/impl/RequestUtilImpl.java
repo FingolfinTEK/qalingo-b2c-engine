@@ -9,19 +9,16 @@
  */
 package org.hoteia.qalingo.core.web.util.impl;
 
-import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -31,9 +28,8 @@ import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.AbstractEngineSession;
 import org.hoteia.qalingo.core.domain.Asset;
 import org.hoteia.qalingo.core.domain.Cart;
-import org.hoteia.qalingo.core.domain.CartItem;
-import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
 import org.hoteia.qalingo.core.domain.Company;
+import org.hoteia.qalingo.core.domain.CurrencyReferential;
 import org.hoteia.qalingo.core.domain.Customer;
 import org.hoteia.qalingo.core.domain.EngineBoSession;
 import org.hoteia.qalingo.core.domain.EngineEcoSession;
@@ -44,14 +40,15 @@ import org.hoteia.qalingo.core.domain.Market;
 import org.hoteia.qalingo.core.domain.MarketArea;
 import org.hoteia.qalingo.core.domain.MarketPlace;
 import org.hoteia.qalingo.core.domain.OrderCustomer;
-import org.hoteia.qalingo.core.domain.ProductSku;
 import org.hoteia.qalingo.core.domain.Retailer;
 import org.hoteia.qalingo.core.domain.User;
 import org.hoteia.qalingo.core.domain.enumtype.EngineSettingWebAppContext;
 import org.hoteia.qalingo.core.domain.enumtype.EnvironmentType;
 import org.hoteia.qalingo.core.pojo.RequestData;
+import org.hoteia.qalingo.core.service.CartService;
 import org.hoteia.qalingo.core.service.CatalogCategoryService;
 import org.hoteia.qalingo.core.service.CustomerService;
+import org.hoteia.qalingo.core.service.EngineSessionService;
 import org.hoteia.qalingo.core.service.EngineSettingService;
 import org.hoteia.qalingo.core.service.LocalizationService;
 import org.hoteia.qalingo.core.service.MarketService;
@@ -115,7 +112,13 @@ public class RequestUtilImpl implements RequestUtil {
     
     @Autowired
     protected UserService userService;
-
+    
+    @Autowired
+    protected EngineSessionService engineSessionService;
+    
+    @Autowired
+    protected CartService cartService;
+    
     /**
 	 *
 	 */
@@ -188,35 +191,6 @@ public class RequestUtilImpl implements RequestUtil {
     }
 
     /**
-	 *
-	 */
-    public NumberFormat getCartItemPriceNumberFormat(final RequestData requestData, final String currencyCode) throws Exception {
-        return getNumberFormat(requestData, currencyCode, RoundingMode.HALF_EVEN, 2, 2, 1000000, 1);
-    }
-
-    /**
-	 *
-	 */
-    public NumberFormat getNumberFormat(final RequestData requestData, final String currencyCode, final RoundingMode roundingMode, final int maximumFractionDigits, final int minimumFractionDigits,
-            final int maximumIntegerDigits, final int minimumIntegerDigits) throws Exception {
-        final Locale locale = requestData.getLocale();
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
-        formatter.setGroupingUsed(true);
-        formatter.setParseIntegerOnly(false);
-        formatter.setRoundingMode(roundingMode);
-        Currency currency = Currency.getInstance(currencyCode);
-        formatter.setCurrency(currency);
-
-        formatter.setMaximumFractionDigits(maximumFractionDigits);
-        formatter.setMinimumFractionDigits(minimumFractionDigits);
-
-        formatter.setMaximumIntegerDigits(maximumIntegerDigits);
-        formatter.setMinimumIntegerDigits(minimumIntegerDigits);
-
-        return formatter;
-    }
-
-    /**
     * 
     */
     public ClickstreamSession getClickstreamSession(final HttpServletRequest request) throws Exception {
@@ -282,6 +256,21 @@ public class RequestUtilImpl implements RequestUtil {
         return getRequestUrl(request, excludedPatterns, 0);
     }
 
+    /**
+    * 
+    */
+    public String getLastRequestForEmptyCartUrl(final HttpServletRequest request, final String fallbackUrl) throws Exception {
+        final List<String> excludedPatterns = new ArrayList<String>();
+        excludedPatterns.add("login");
+        excludedPatterns.add("auth");
+        excludedPatterns.add("logout");
+        excludedPatterns.add("timeout");
+        excludedPatterns.add("forbidden");
+        excludedPatterns.add("cart");
+        String lastUrl = getLastRequestUrl(request, excludedPatterns, fallbackUrl);
+        return lastUrl;
+    }
+    
     /**
     * 
     */
@@ -447,6 +436,22 @@ public class RequestUtilImpl implements RequestUtil {
         }
         return productSkuImageWebPath;
     }
+    
+    /**
+     * 
+     */
+    public String getRetailerOrStoreImageWebPath(final HttpServletRequest request, final Asset asset) throws Exception {
+        EngineSetting engineSetting = engineSettingService.getAssetRetailerAndStoreFilePath();
+        String prefixPath = "";
+        if (engineSetting != null) {
+            prefixPath = engineSetting.getDefaultValue();
+        }
+        String storeImageWebPath = getRootAssetWebPath(request) + prefixPath + "/" + asset.getScope().name().toLowerCase() + "/" + asset.getType().getPropertyKey().toLowerCase() + "/" + asset.getPath();
+        if (storeImageWebPath.endsWith("/")) {
+            storeImageWebPath = storeImageWebPath.substring(0, storeImageWebPath.length() - 1);
+        }
+        return storeImageWebPath;
+    }
 
     /**
      * 
@@ -519,8 +524,9 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public void updateCurrentEcoSession(final HttpServletRequest request, final EngineEcoSession engineEcoSession) throws Exception {
+    public EngineEcoSession updateCurrentEcoSession(final HttpServletRequest request, EngineEcoSession engineEcoSession) throws Exception {
         setCurrentEcoSession(request, engineEcoSession);
+        return engineEcoSession;
     }
 
     /**
@@ -530,6 +536,7 @@ public class RequestUtilImpl implements RequestUtil {
         request.getSession().setAttribute(Constants.ENGINE_ECO_SESSION_OBJECT, engineEcoSession);
     }
 
+    
     /**
      * 
      */
@@ -556,98 +563,38 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Cart getCurrentCart(final HttpServletRequest request) throws Exception {
+    public void resetCurrentCart(final HttpServletRequest request) throws Exception {
         EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
-        return engineEcoSession.getCart();
-    }
-
-    /**
-     * 
-     */
-    public void updateCurrentCart(final HttpServletRequest request, final Cart cart) throws Exception {
-        EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
-        engineEcoSession.setCart(cart);
+        engineEcoSession.resetCurrentCart();
         updateCurrentEcoSession(request, engineEcoSession);
-    }
-
-    /**
-     * 
-     */
-    public void updateCurrentCart(final RequestData requestData, final String skuCode, final int quantity) throws Exception {
-        updateCurrentCart(requestData, null, skuCode, quantity);
     }
     
     /**
      * 
      */
-    public void updateCurrentCart(final RequestData requestData, final String catalogCategoryCode, final String productSkuCode, final int quantity) throws Exception {
+    public void updateCurrentCart(final HttpServletRequest request, final Cart cart) throws Exception {
+        // SAVE AND UPDATE THE ENGINE SESSION AT THE END
+        EngineEcoSession engineEcoSessionWithTransientValues = getCurrentEcoSession(request);
+        engineEcoSessionWithTransientValues.updateCart(cart);
+        engineEcoSessionWithTransientValues = engineSessionService.updateAndSynchronizeEngineEcoSession(engineEcoSessionWithTransientValues);
+        updateCurrentEcoSession(request, engineEcoSessionWithTransientValues); 
+    }
+    
+    /**
+     * 
+     */
+    public void deleteCurrentCartAndSaveEngineSession(final HttpServletRequest request) throws Exception {
+        EngineEcoSession engineEcoSessionWithTransientValues = getCurrentEcoSession(request);
+        engineEcoSessionWithTransientValues.deleteCurrentCart();
+        engineSessionService.updateAndSynchronizeEngineEcoSession(engineEcoSessionWithTransientValues);
+        updateCurrentEcoSession(request, engineEcoSessionWithTransientValues); 
+    }
+    
+    /**
+     * 
+     */
+    public OrderCustomer getLastOrder(final RequestData requestData) throws Exception {
         final HttpServletRequest request = requestData.getRequest();
-        
-        // SANITY CHECK : sku code is empty or null : no sense
-        if (StringUtils.isEmpty(productSkuCode)) {
-            throw new Exception("");
-        }
-
-        // SANITY CHECK : quantity is equal zero : no sense
-        if (quantity == 0) {
-            throw new Exception("");
-        }
-
-        Cart cart = getCurrentCart(request);
-        Set<CartItem> cartItems = cart.getCartItems();
-        boolean productSkuIsNew = true;
-        for (Iterator<CartItem> iterator = cartItems.iterator(); iterator.hasNext();) {
-            CartItem cartItem = (CartItem) iterator.next();
-            if (cartItem.getProductSkuCode().equalsIgnoreCase(productSkuCode)) {
-                int newQuantity = cartItem.getQuantity() + quantity;
-                cartItem.setQuantity(newQuantity);
-                productSkuIsNew = false;
-            }
-        }
-        if (productSkuIsNew) {
-            CartItem cartItem = new CartItem();
-            ProductSku productSku = productService.getProductSkuByCode(productSkuCode);
-            cartItem.setProductSkuCode(productSkuCode);
-            cartItem.setProductSku(productSku);
-            cartItem.setQuantity(quantity);
-            if(catalogCategoryCode != null){
-                CatalogCategoryVirtual catalogCategory = catalogCategoryService.getVirtualCatalogCategoryByCode(catalogCategoryCode);
-                cartItem.setCatalogCategoryCode(catalogCategoryCode);
-                cartItem.setCatalogCategory(catalogCategory);
-            }
-            cart.getCartItems().add(cartItem);
-        }
-        updateCurrentCart(request, cart);
-
-        // TODO update session/cart db ?
-    }
-
-    /**
-     * 
-     */
-    public void updateCurrentCart(final HttpServletRequest request, final Long billingAddressId, final Long shippingAddressId) throws Exception {
-        Cart cart = getCurrentCart(request);
-        cart.setBillingAddressId(billingAddressId);
-        cart.setShippingAddressId(shippingAddressId);
-        updateCurrentCart(request, cart);
-
-        // TODO update session/cart db ?
-    }
-
-    /**
-     * 
-     */
-    public void cleanCurrentCart(final HttpServletRequest request) throws Exception {
-        Cart cart = new Cart();
-        updateCurrentCart(request, cart);
-
-        // TODO update session/cart db ?
-    }
-
-    /**
-     * 
-     */
-    public OrderCustomer getLastOrder(final HttpServletRequest request) throws Exception {
         EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
         return engineEcoSession.getLastOrder();
     }
@@ -655,8 +602,9 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public void saveLastOrder(final HttpServletRequest request, final OrderCustomer order) throws Exception {
+    public void keepLastOrderInSession(final RequestData requestData, final OrderCustomer order) throws Exception {
         if (order != null) {
+            final HttpServletRequest request = requestData.getRequest();
             EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
             engineEcoSession.setLastOrder(order);
             updateCurrentEcoSession(request, engineEcoSession);
@@ -666,26 +614,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public void removeCartItemFromCurrentCart(final HttpServletRequest request, final String skuCode) throws Exception {
-        Cart cart = getCurrentCart(request);
-        Set<CartItem> cartItems = cart.getCartItems();
-        for (Iterator<CartItem> iterator = cartItems.iterator(); iterator.hasNext();) {
-            CartItem cartItem = (CartItem) iterator.next();
-            if (cartItem.getProductSkuCode().equalsIgnoreCase(skuCode)) {
-                cartItems.remove(cartItem);
-            }
-        }
-        cart.setCartItems(cartItems);
-        updateCurrentCart(request, cart);
-
-        // TODO update session/cart db ?
-
-    }
-
-    /**
-     * 
-     */
-    public MarketPlace getCurrentMarketPlace(final RequestData requestData) throws Exception {
+    protected MarketPlace getCurrentMarketPlace(final RequestData requestData) throws Exception {
         MarketPlace marketPlace = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -709,7 +638,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Market getCurrentMarket(final RequestData requestData) throws Exception {
+    protected Market getCurrentMarket(final RequestData requestData) throws Exception {
         Market market = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -733,7 +662,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public MarketArea getCurrentMarketArea(final RequestData requestData) throws Exception {
+    protected MarketArea getCurrentMarketArea(final RequestData requestData) throws Exception {
         MarketArea marketArea = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -757,7 +686,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Localization getCurrentMarketLocalization(final RequestData requestData) throws Exception {
+    protected Localization getCurrentMarketLocalization(final RequestData requestData) throws Exception {
         Localization localization = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -773,7 +702,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Localization getCurrentMarketAreaLocalization(final RequestData requestData) throws Exception {
+    protected Localization getCurrentMarketAreaLocalization(final RequestData requestData) throws Exception {
         Localization localization = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -785,25 +714,6 @@ public class RequestUtilImpl implements RequestUtil {
         }
         return localization;
     }
-
-//    /**
-//     * 
-//     */
-//    public Locale getCurrentLocale(final HttpServletRequest request) throws Exception {
-//        Localization localization = getCurrentMarketAreaLocalization(request);
-//        if (localization != null) {
-//            return localization.getLocale();
-//        } else {
-//            logger.warn("Current Locale is null and it is not possible. Need to reset session.");
-//            if (isBackoffice()) {
-//                initDefaultBoMarketPlace(request);
-//            } else {
-//                initDefaultEcoMarketPlace(request);
-//            }
-//            localization = getCurrentMarketAreaLocalization(request);
-//            return localization.getLocale();
-//        }
-//    }
 
     /**
      * 
@@ -826,7 +736,7 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Retailer getCurrentRetailer(final RequestData requestData) throws Exception {
+    protected Retailer getCurrentRetailer(final RequestData requestData) throws Exception {
         Retailer retailer = null;
         final HttpServletRequest request = requestData.getRequest();
         if (requestData.isBackoffice()) {
@@ -848,7 +758,23 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    public Customer getCurrentCustomer(final HttpServletRequest request) throws Exception {
+    protected CurrencyReferential getCurrentCurrency(final HttpServletRequest request) throws Exception {
+        EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
+        return engineEcoSession.getCurrentMarketAreaCurrency();
+    }
+
+    /**
+     * 
+     */
+    protected Cart getCurrentCart(final HttpServletRequest request) throws Exception {
+        EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
+        return engineEcoSession.getCart();
+    }
+    
+    /**
+     * 
+     */
+    protected Customer getCurrentCustomer(final HttpServletRequest request) throws Exception {
         EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
         Customer customer = engineEcoSession.getCurrentCustomer();
         if (customer == null) {
@@ -954,26 +880,28 @@ public class RequestUtilImpl implements RequestUtil {
         String marketAreaCode = null;
         String localizationCode = null;
         String retailerCode = null;
-        
+        String currencyCode = null;
+
         // TEMP
         String requestUri = request.getRequestURI();
         requestUri = requestUri.replace(request.getContextPath(), "");
-        if(requestUri.startsWith("/")){
+        if (requestUri.startsWith("/")) {
             requestUri = requestUri.substring(1, requestUri.length());
         }
         String[] uriSegments = requestUri.toString().split("/");
-        if(uriSegments.length > 4){
+        if (uriSegments.length > 4) {
             marketPlaceCode = uriSegments[0];
             marketCode = uriSegments[1];
             marketAreaCode = uriSegments[2];
             localizationCode = uriSegments[3];
             retailerCode = uriSegments[4];
         } else {
-          marketPlaceCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE);
-          marketCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_CODE);
-          marketAreaCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE);
-          localizationCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_LANGUAGE);
-          retailerCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_RETAILER_CODE);
+            marketPlaceCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE);
+            marketCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_CODE);
+            marketAreaCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE);
+            localizationCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_LANGUAGE);
+            retailerCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_RETAILER_CODE);
+            currencyCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CURRENCY_CODE);
         }
 
         EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
@@ -982,7 +910,6 @@ public class RequestUtilImpl implements RequestUtil {
         if (StringUtils.isNotEmpty(marketPlaceCode) && StringUtils.isNotEmpty(marketCode) && StringUtils.isNotEmpty(marketAreaCode) && StringUtils.isNotEmpty(localizationCode)) {
             if (currentMarketPlace != null && !currentMarketPlace.getCode().equalsIgnoreCase(marketPlaceCode)) {
                 // RESET ALL SESSION AND CHANGE THE MARKET PLACE
-                resetCart(request);
                 initEcoSession(request);
                 MarketPlace newMarketPlace = marketService.getMarketPlaceByCode(marketPlaceCode);
                 if (newMarketPlace == null) {
@@ -1024,13 +951,20 @@ public class RequestUtilImpl implements RequestUtil {
                     } else {
                         setSessionMarketAreaRetailer(engineEcoSession, retailer);
                     }
+                    
+                    // CURRENCY
+                    CurrencyReferential currency = marketArea.getCurrency(currencyCode);
+                    if (currency == null) {
+                        CurrencyReferential defaultCurrency = marketArea.getDefaultCurrency();
+                        setSessionMarketAreaCurrency(engineEcoSession, defaultCurrency);
+                    } else {
+                        setSessionMarketAreaCurrency(engineEcoSession, currency);
+                    }
                 }
 
             } else {
                 Market market = engineEcoSession.getCurrentMarket();
                 if (market != null && !market.getCode().equalsIgnoreCase(marketCode)) {
-                    // RESET CART
-                    resetCart(request);
 
                     // CHANGE THE MARKET
                     Market newMarket = marketService.getMarketByCode(marketCode);
@@ -1064,18 +998,26 @@ public class RequestUtilImpl implements RequestUtil {
                     } else {
                         setSessionMarketAreaRetailer(engineEcoSession, retailer);
                     }
+                    
+                    // CURRENCY
+                    CurrencyReferential currency = marketArea.getCurrency(currencyCode);
+                    if (currency == null) {
+                        CurrencyReferential defaultCurrency = marketArea.getDefaultCurrency();
+                        setSessionMarketAreaCurrency(engineEcoSession, defaultCurrency);
+                    } else {
+                        setSessionMarketAreaCurrency(engineEcoSession, currency);
+                    }
+                    
                 } else {
                     MarketArea marketArea = engineEcoSession.getCurrentMarketArea();
                     if (marketArea != null && !marketArea.getCode().equalsIgnoreCase(marketAreaCode)) {
-                        // RESET CART
-                        resetCart(request);
 
                         // CHANGE THE MARKET MODE
                         MarketArea newMarketArea = market.getMarketArea(marketAreaCode);
                         if (newMarketArea == null) {
                             newMarketArea = market.getDefaultMarketArea();
                         }
-                        setSessionMarketArea(engineEcoSession, marketArea);
+                        setSessionMarketArea(engineEcoSession, newMarketArea);
                         updateCurrentTheme(request, newMarketArea.getTheme());
 
                         // LOCALE
@@ -1095,6 +1037,16 @@ public class RequestUtilImpl implements RequestUtil {
                         } else {
                             setSessionMarketAreaRetailer(engineEcoSession, retailer);
                         }
+                        
+                        // CURRENCY
+                        CurrencyReferential currency = marketArea.getCurrency(currencyCode);
+                        if (currency == null) {
+                            CurrencyReferential defaultCurrency = marketArea.getDefaultCurrency();
+                            setSessionMarketAreaCurrency(engineEcoSession, defaultCurrency);
+                        } else {
+                            setSessionMarketAreaCurrency(engineEcoSession, currency);
+                        }
+                        
                     } else {
                         Localization localization = engineEcoSession.getCurrentMarketAreaLocalization();
                         if (localization != null && !localization.getLocale().toString().equalsIgnoreCase(localizationCode)) {
@@ -1106,27 +1058,36 @@ public class RequestUtilImpl implements RequestUtil {
                             } else {
                                 setSessionMarketAreaLocalization(engineEcoSession, newLocalization);
                             }
-
-                            // RETAILER
-                            Retailer retailer = marketArea.getRetailer(retailerCode);
-                            if (retailer == null) {
+                        }
+                        
+                        Retailer retailer = engineEcoSession.getCurrentMarketAreaRetailer();
+                        if (retailer != null && !retailer.getCode().toString().equalsIgnoreCase(retailerCode)) {
+                            // CHANGE THE RETAILER
+                            Retailer newRetailer = marketArea.getRetailer(retailerCode);
+                            if (newRetailer == null) {
                                 Retailer defaultRetailer = marketArea.getDefaultRetailer();
                                 setSessionMarketAreaRetailer(engineEcoSession, defaultRetailer);
                             } else {
-                                setSessionMarketAreaRetailer(engineEcoSession, retailer);
+                                setSessionMarketAreaRetailer(engineEcoSession, newRetailer);
                             }
-
-                        } else {
-                            Retailer retailer = engineEcoSession.getCurrentMarketAreaRetailer();
-                            if (retailer != null && !retailer.getCode().toString().equalsIgnoreCase(retailerCode)) {
-                                // CHANGE THE RETAILER
-                                Retailer newRetailer = marketArea.getRetailer(retailerCode);
-                                if (newRetailer == null) {
-                                    Retailer defaultRetailer = marketArea.getDefaultRetailer();
-                                    setSessionMarketAreaRetailer(engineEcoSession, defaultRetailer);
-                                } else {
-                                    setSessionMarketAreaRetailer(engineEcoSession, newRetailer);
+                            
+                        } 
+                        
+                        CurrencyReferential currency = engineEcoSession.getCurrentMarketAreaCurrency();
+                        if (currency != null && !currency.getCode().toString().equalsIgnoreCase(currencyCode)) {
+                            // CHANGE THE CURRENCY
+                            CurrencyReferential newCurrency = marketArea.getCurrency(currencyCode);
+                            if (newCurrency == null) {
+                                CurrencyReferential defaultCurrency = marketArea.getDefaultCurrency();
+                                if(engineEcoSession.getCart() != null){
+                                    engineEcoSession.getCart().setCurrency(defaultCurrency);
                                 }
+                                setSessionMarketAreaCurrency(engineEcoSession, defaultCurrency);
+                            } else {
+                                if(engineEcoSession.getCart() != null){
+                                    engineEcoSession.getCart().setCurrency(newCurrency);
+                                }
+                                setSessionMarketAreaCurrency(engineEcoSession, newCurrency);
                             }
                         }
                     }
@@ -1190,8 +1151,8 @@ public class RequestUtilImpl implements RequestUtil {
         String marketPlaceCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE);
         String marketCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_CODE);
         String marketAreaCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE);
-        String marketAreaLanguageCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_LANGUAGE);
-        String marketAreaRetailerCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_RETAILER_CODE);
+        String marketAreaLanguageCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_LANGUAGE);
+        String marketAreaRetailerCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_MARKET_AREA_RETAILER_CODE);
 
         EngineBoSession engineBoSession = getCurrentBoSession(request);
 
@@ -1281,6 +1242,7 @@ public class RequestUtilImpl implements RequestUtil {
                     } else {
                         setSessionMarketAreaRetailer(engineBoSession, retailer);
                     }
+                    
                 } else {
                     MarketArea marketArea = engineBoSession.getCurrentMarketArea();
                     if (marketArea != null && !marketArea.getCode().equalsIgnoreCase(marketAreaCode)) {
@@ -1310,6 +1272,7 @@ public class RequestUtilImpl implements RequestUtil {
                         } else {
                             setSessionMarketAreaRetailer(engineBoSession, retailer);
                         }
+                        
                     } else {
                         Localization localization = engineBoSession.getCurrentMarketAreaLocalization();
                         if (localization != null && !localization.getLocale().toString().equalsIgnoreCase(marketAreaLanguageCode)) {
@@ -1436,7 +1399,7 @@ public class RequestUtilImpl implements RequestUtil {
      * 
      */
     public RequestData getRequestData(final HttpServletRequest request) throws Exception {
-        RequestData requestData = new RequestData();
+        final RequestData requestData = new RequestData();
         requestData.setRequest(request);
         String contextPath = "";
         if (request.getRequestURL().toString().contains("localhost") || request.getRequestURL().toString().contains("127.0.0.1")) {
@@ -1469,6 +1432,9 @@ public class RequestUtilImpl implements RequestUtil {
         requestData.setMarketArea(getCurrentMarketArea(requestData));
         requestData.setMarketAreaLocalization(getCurrentMarketAreaLocalization(requestData));
         requestData.setMarketAreaRetailer(getCurrentRetailer(requestData));
+        requestData.setMarketAreaCurrency(getCurrentCurrency(request));
+
+        requestData.setCart(getCurrentCart(request));
 
         return requestData;
     }
@@ -1477,7 +1443,7 @@ public class RequestUtilImpl implements RequestUtil {
 	 * 
 	 */
     protected EngineEcoSession initEcoSession(final HttpServletRequest request) throws Exception {
-        final EngineEcoSession engineEcoSession = new EngineEcoSession();
+        EngineEcoSession engineEcoSession = new EngineEcoSession();
         EngineSetting engineSettingEnvironmentStagingModeEnabled = engineSettingService.getEnvironmentStagingModeEnabled();
         if (engineSettingEnvironmentStagingModeEnabled != null) {
             engineEcoSession.setEnvironmentStagingModeEnabled(BooleanUtils.toBoolean(engineSettingEnvironmentStagingModeEnabled.getDefaultValue()));
@@ -1503,9 +1469,13 @@ public class RequestUtilImpl implements RequestUtil {
         setCurrentEcoSession(request, engineEcoSession);
         String jSessionId = request.getSession().getId();
         engineEcoSession.setjSessionId(jSessionId);
-        initCart(request);
-        initDefaultEcoMarketPlace(request);
-        updateCurrentEcoSession(request, engineEcoSession);
+        engineEcoSession = initDefaultEcoMarketPlace(request);
+        engineEcoSession = initCart(request);
+        
+        engineEcoSession = updateCurrentEcoSession(request, engineEcoSession);
+        
+        engineEcoSession = engineSessionService.saveOrUpdateEngineEcoSession(engineEcoSession);
+        
         return engineEcoSession;
     }
 
@@ -1513,10 +1483,30 @@ public class RequestUtilImpl implements RequestUtil {
      * 
      */
     protected EngineEcoSession checkEngineEcoSession(final HttpServletRequest request, EngineEcoSession engineEcoSession) throws Exception {
-        if (engineEcoSession == null) {
-            engineEcoSession = initEcoSession(request);
-        }
         String jSessionId = request.getSession().getId();
+        if (engineEcoSession == null) {
+            // RELOAD OLD SESSION
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                Cookie ecoEngineSessionGuid = null;
+                for (int i = 0; i < cookies.length; i++) {
+                    Cookie cookie = cookies[i];
+                    if (Constants.COOKIE_ECO_ENGINE_SESSION_ID.equals(cookie.getName())) {
+                        ecoEngineSessionGuid = cookies[i];
+                        break;
+                    }
+                }
+                if(ecoEngineSessionGuid != null){
+                    EngineEcoSession engineEcoSessionWithTransientValues = initEcoSession(request);
+                    engineSessionService.synchronizeEngineEcoSession(engineEcoSessionWithTransientValues, ecoEngineSessionGuid.getValue());
+                }
+            }
+            if(engineEcoSession == null){
+                engineEcoSession = initEcoSession(request);
+            }
+            
+        }
+        // SANITY CHECK
         if (!engineEcoSession.getjSessionId().equals(jSessionId)) {
             engineEcoSession.setjSessionId(jSessionId);
             updateCurrentEcoSession(request, engineEcoSession);
@@ -1621,15 +1611,15 @@ public class RequestUtilImpl implements RequestUtil {
     /**
      * 
      */
-    protected void initCart(final HttpServletRequest request) throws Exception {
+    protected EngineEcoSession initCart(final HttpServletRequest request) throws Exception {
         final EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
         Cart cart = engineEcoSession.getCart();
         if (cart == null) {
             // Init a new empty Cart with a default configuration
-            cart = new Cart();
+            engineEcoSession.addNewCart();
         }
-        engineEcoSession.setCart(cart);
         updateCurrentEcoSession(request, engineEcoSession);
+        return engineEcoSession;
     }
 
     /**
@@ -1637,25 +1627,25 @@ public class RequestUtilImpl implements RequestUtil {
      * 
      */
     protected void resetCart(final HttpServletRequest request) throws Exception {
-        // TODO : save the current cart
-
         // Reset Cart
-        updateCurrentCart(request, new Cart());
+        final EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
+        engineEcoSession.resetCurrentCart();
+        updateCurrentEcoSession(request, engineEcoSession);
     }
 
     /**
      * 
      */
-    protected void initDefaultEcoMarketPlace(final HttpServletRequest request) throws Exception {
-        final EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
+    protected EngineEcoSession initDefaultEcoMarketPlace(final HttpServletRequest request) throws Exception {
+        EngineEcoSession engineEcoSession = getCurrentEcoSession(request);
         MarketPlace marketPlace = marketService.getDefaultMarketPlace();
-        setSessionMarketPlace(engineEcoSession, marketPlace);
+        engineEcoSession = (EngineEcoSession) setSessionMarketPlace(engineEcoSession, marketPlace);
 
         Market market = marketPlace.getDefaultMarket();
-        setSessionMarket(engineEcoSession, market);
+        engineEcoSession = (EngineEcoSession) setSessionMarket(engineEcoSession, market);
 
         MarketArea marketArea = market.getDefaultMarketArea();
-        setSessionMarketArea(engineEcoSession, marketArea);
+        engineEcoSession = (EngineEcoSession) setSessionMarketArea(engineEcoSession, marketArea);
 
         // DEFAULT LOCALE IS FROM THE REQUEST OR FROM THE MARKET AREA
         String requestLocale = request.getLocale().toString();
@@ -1670,38 +1660,53 @@ public class RequestUtilImpl implements RequestUtil {
                 }
             }
         }
-        setSessionMarketAreaLocalization(engineEcoSession, localization);
+        engineEcoSession = (EngineEcoSession) setSessionMarketAreaLocalization(engineEcoSession, localization);
 
         Retailer retailer = marketArea.getDefaultRetailer();
-        setSessionMarketAreaRetailer(engineEcoSession, retailer);
+        engineEcoSession = (EngineEcoSession) setSessionMarketAreaRetailer(engineEcoSession, retailer);
 
-        updateCurrentEcoSession(request, engineEcoSession);
+        CurrencyReferential currency = marketArea.getDefaultCurrency();
+        engineEcoSession = (EngineEcoSession) setSessionMarketAreaCurrency(engineEcoSession, currency);
+
+        setCurrentEcoSession(request, engineEcoSession);
+        
+        return  engineEcoSession; 
     }
     
-    protected void setSessionMarketPlace(final AbstractEngineSession session, final MarketPlace marketPlace){
+    protected AbstractEngineSession setSessionMarketPlace(final AbstractEngineSession session, final MarketPlace marketPlace){
         session.setCurrentMarketPlace(marketPlace);
+        return session;
     }
 
-    protected void setSessionMarket(final AbstractEngineSession session, final Market market){
+    protected AbstractEngineSession setSessionMarket(final AbstractEngineSession session, final Market market){
         // TODO : why : SET A RELOAD OBJECT MARKET -> event
         // LazyInitializationException: could not initialize proxy -
         // no Session
         session.setCurrentMarket(marketService.getMarketById(market.getId().toString()));
+        return session;
     }
 
-    protected void setSessionMarketArea(final AbstractEngineSession session, final MarketArea marketArea){
+    protected AbstractEngineSession setSessionMarketArea(final AbstractEngineSession session, final MarketArea marketArea){
         // TODO : why : SET A RELOAD OBJECT MARKET AREA -> event
         // LazyInitializationException: could not initialize proxy -
         // no Session
         session.setCurrentMarketArea(marketService.getMarketAreaById(marketArea.getId().toString()));
+        return session;
     }
 
-    protected void setSessionMarketAreaRetailer(final AbstractEngineSession session, final Retailer retailer){
-        session.setCurrentMarketAreaRetailer(retailerService.getRetailerById(retailer.getId().toString()));
-    }
-
-    protected void setSessionMarketAreaLocalization(final AbstractEngineSession session, final Localization localization){
+    protected AbstractEngineSession setSessionMarketAreaLocalization(final AbstractEngineSession session, final Localization localization){
         session.setCurrentMarketAreaLocalization(localizationService.getLocalizationById(localization.getId().toString()));
+        return session;
+    }
+
+    protected AbstractEngineSession setSessionMarketAreaRetailer(final AbstractEngineSession session, final Retailer retailer){
+        session.setCurrentMarketAreaRetailer(retailerService.getRetailerById(retailer.getId().toString()));
+        return session;
+    }
+    
+    protected AbstractEngineSession setSessionMarketAreaCurrency(final AbstractEngineSession session, final CurrencyReferential currency){
+        session.setCurrentMarketAreaCurrency(currency);
+        return session;
     }
 
 }

@@ -37,6 +37,9 @@ public final class ModelConstants {
     public static final String SEO_PAGE_META_TITLE          = "seoPageTitle";
     public static final String MAIN_CONTENT_TITLE           = "mainContentTitle";
 
+    // CHECKOUT PROCESS
+    public static final String CHECKOUT_STEP                = "checkoutStep";
+
     // WORDING
     public static final String WORDING = "wording";
 
@@ -51,14 +54,21 @@ public final class ModelConstants {
     public static final String COMMON_VIEW_BEAN                     = "common";
     public static final String MENUS_VIEW_BEAN                      = "menus";
     public static final String MORE_PAGE_MENUS_VIEW_BEAN            = "morePageMenus";
+    public static final String BREADCRUMB_VIEW_BEAN                 = "breadcrumb";
+    public static final String CATALOG_BREADCRUMB_VIEW_BEAN         = "catalogBreadcrumb";
+
     public static final String MARKET_PLACES_VIEW_BEAN              = "marketPlaces";
     public static final String MARKETS_VIEW_BEAN                    = "markets";
+    
     public static final String MARKET_AREA_VIEW_BEAN                = "marketArea";
     public static final String MARKET_AREAS_VIEW_BEAN               = "marketAreas";
     public static final String MARKET_AREA_LANGUAGES_VIEW_BEAN      = "marketAreaLocalizations";
     public static final String MARKET_AREA_RETAILERS_VIEW_BEAN      = "marketAreaRetailers";
+    public static final String MARKET_AREA_CURRENCIES_VIEW_BEAN     = "marketAreaCurrencies";
+
     public static final String RETAILERS_VIEW_BEAN                  = "retailers";
     public static final String RETAILER_VIEW_BEAN                   = "retailer";
+    
     public static final String BACKOFFICE_LOCALIZATION_VIEW_BEAN    = "backofficeLocalizations";
     public static final String LEGAl_TERMS_VIEW_BEAN                = "legalTerms";
     public static final String CONDITIONS_OF_USE_VIEW_BEAN          = "conditions";
@@ -69,36 +79,49 @@ public final class ModelConstants {
     public static final String SECURITY_VIEW_BEAN                   = "security";
     public static final String XRDS_URL_VIEW_BEAN                   = "xrdsUrl";
 
-    public static final String TRACKING_VIEW_BEAN               = "tracking";
-    public static final String MONITORING_VIEW_BEAN             = "monitoring";
+    public static final String TRACKING_VIEW_BEAN                   = "tracking";
+    public static final String MONITORING_VIEW_BEAN                 = "monitoring";
 
-    public static final String CATALOG_VIEW_BEAN                = "catalog";
-    public static final String CATALOG_CATEGORY_VIEW_BEAN       = "catalogCategory";
-    public static final String PRODUCT_MARKETING_VIEW_BEAN      = "productMarketing";
-    public static final String PRODUCT_SKU_VIEW_BEAN            = "productSku";
+    public static final String CATALOG_VIEW_BEAN                    = "catalog";
+    public static final String CATALOG_CATEGORY_VIEW_BEAN           = "catalogCategory";
+    public static final String CATALOG_CATEGORIES_VIEW_BEAN         = "catalogCategories";
+    public static final String PRODUCT_MARKETING_VIEW_BEAN          = "productMarketing";
+    public static final String PRODUCT_SKU_VIEW_BEAN                = "productSku";
+    public static final String PRODUCT_BRANDS_VIEW_BEAN             = "productBrands";
+    public static final String RECENT_PPRODUCT_MARKETING_VIEW_BEAN  = "recentProducts";
+    public static final String RELATED_PPRODUCT_MARKETING_VIEW_BEAN = "relatedProductMarketings";
 
     public static final String ASSET_VIEW_BEAN                  = "asset";
 
     public static final String CART_VIEW_BEAN                   = "cart";
     public static final String ADDRESSES_VIEW_BEAN              = "addresses";
+    public static final String SHIPPING_ADDRESSES_VIEW_BEAN     = "shippingAddresses";
+    public static final String BILLING_ADDRESSES_VIEW_BEAN      = "billingAddresses";
+    public static final String PAYMENT_METHODS_VIEW_BEAN        = "paymentMethods";
 
     public static final String RULE_VIEW_BEAN                   = "rule";
     public static final String ORDER_VIEW_BEAN                  = "order";
-    public static final String SHIPPING_VIEW_BEAN               = "shipping";
+    
+    public static final String DELIVERY_METHODS_VIEW_BEAN       = "deliveryMethods";
+    public static final String DELIVERY_METHOD_VIEW_BEAN        = "deliveryMethod";
+
     public static final String CUSTOMER_VIEW_BEAN               = "customer";
     public static final String CUSTOMER_DETAILS_LINKS_VIEW_BEAN = "customerLinks";
     public static final String CUSTOMER_DETAILS_VIEW_BEAN       = "customerDetails";
     public static final String USER_VIEW_BEAN                   = "user";
 
     // SPRING FORM
-    public static final String ASSET_FORM           = "assetForm";
-    public static final String RULE_FORM            = "ruleForm";
-    public static final String ORDER_FORM           = "orderForm";
-    public static final String SHIPPING_FORM        = "shippingForm";
-    public static final String CUSTOMER_FORM        = "customerForm";
-    public static final String USER_FORM            = "userForm";
-    public static final String CART_FORM            = "cartForm";
-    public static final String PAYMENT_FORM         = "paymentForm";
+    public static final String ASSET_FORM               = "assetForm";
+    public static final String RULE_FORM                = "ruleForm";
+    public static final String ORDER_FORM               = "orderForm";
+    public static final String DELIVERY_METHOD_FORM     = "deliveryMethodForm";
+    public static final String CUSTOMER_FORM            = "customerForm";
+    public static final String USER_FORM                = "userForm";
+    public static final String CART_FORM                = "cartForm";
+    public static final String PAYMENT_FORM             = "paymentForm";
+    public static final String CREATE_ACCOUNT_FORM      = "createAccountForm";
+    public static final String PRODUCT_SKU_FORM         = "productSkuForm";
+    public static final String PRODUCT_MARKETING_FORM   = "productMarketingForm";
 
     // AUTH
     public static final String AUTH_HAS_FAIL        = "authHasFail";
@@ -128,4 +151,8 @@ public final class ModelConstants {
     public static final String TITLES           = "titles";
     public static final String COUNTRIES        = "countries";
 
+    public static final String CONTEXT_JSON     = "contextJson";
+
+    public static final String ORDER_CONFIRMATION_PDF_URL   = "orderConfirmationPdfUrl";
+    
 }

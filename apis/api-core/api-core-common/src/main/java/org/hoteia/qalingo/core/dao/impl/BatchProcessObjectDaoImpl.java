@@ -31,14 +31,14 @@ public class BatchProcessObjectDaoImpl extends AbstractGenericDaoImpl implements
 
 	public BatchProcessObject getBatchProcessObjectById(final Long batchProcessObjectId) {
 	    
-        Criteria criteria = getSession().createCriteria(BatchProcessObject.class);
+        Criteria criteria = createDefaultCriteria(BatchProcessObject.class);
         criteria.add(Restrictions.eq("id", batchProcessObjectId));
         BatchProcessObject batchProcessObject = (BatchProcessObject) criteria.uniqueResult();
         return batchProcessObject;
 	}
 
 	public List<BatchProcessObject> findBatchProcessObjects() {
-        Criteria criteria = getSession().createCriteria(BatchProcessObject.class);
+        Criteria criteria = createDefaultCriteria(BatchProcessObject.class);
 
         @SuppressWarnings("unchecked")
         List<BatchProcessObject> batchProcessObjects = criteria.list();
@@ -48,8 +48,8 @@ public class BatchProcessObjectDaoImpl extends AbstractGenericDaoImpl implements
 		return batchProcessObjects;
 	}
 	
-	public List<BatchProcessObject> findBatchProcessObjectsByTypeObject(BatchProcessObjectType typeObject) {
-        Criteria criteria = getSession().createCriteria(BatchProcessObject.class);
+	public List<BatchProcessObject> findBatchProcessObjectsByTypeObject(final BatchProcessObjectType typeObject) {
+        Criteria criteria = createDefaultCriteria(BatchProcessObject.class);
 
         criteria.add(Restrictions.eq("typeObject", typeObject));
         
@@ -63,19 +63,25 @@ public class BatchProcessObjectDaoImpl extends AbstractGenericDaoImpl implements
         return batchProcessObjects;
 	}
 	
-	public void saveOrUpdateBatchProcessObject(BatchProcessObject batchProcessObject) {
+	public BatchProcessObject saveOrUpdateBatchProcessObject(final BatchProcessObject batchProcessObject) {
 		if(batchProcessObject.getDateCreate() == null){
 			batchProcessObject.setDateCreate(new Date());
 		}
 		batchProcessObject.setDateUpdate(new Date());
-		if(batchProcessObject.getId() == null){
-			em.persist(batchProcessObject);
-		} else {
-			em.merge(batchProcessObject);
-		}
+        if (batchProcessObject.getId() != null) {
+            if(em.contains(batchProcessObject)){
+                em.refresh(batchProcessObject);
+            }
+            BatchProcessObject mergedBatchProcessObject = em.merge(batchProcessObject);
+            em.flush();
+            return mergedBatchProcessObject;
+        } else {
+            em.persist(batchProcessObject);
+            return batchProcessObject;
+        }
 	}
 
-	public void deleteBatchProcessObject(BatchProcessObject batchProcessObject) {
+	public void deleteBatchProcessObject(final BatchProcessObject batchProcessObject) {
 		em.remove(batchProcessObject);
 	}
 

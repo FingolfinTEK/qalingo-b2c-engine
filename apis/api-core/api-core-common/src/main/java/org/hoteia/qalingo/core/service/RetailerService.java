@@ -20,6 +20,8 @@ public interface RetailerService {
 
 	// RETAILER
 	
+    Retailer getRetailerById(Long retailerId);
+    
 	Retailer getRetailerById(String retailerId);
 
     Retailer getRetailerByCode(String retailerCode);
@@ -48,6 +50,8 @@ public interface RetailerService {
 	
 	void deleteRetailer(Retailer retailer);
 	
+    // RETAILER COMMENT/RATE
+	
 	void saveOrUpdateRetailerCustomerRate(RetailerCustomerRate retailerCustomerRate);
 	
 	void deleteRetailerCustomerRate(RetailerCustomerRate retailerCustomerRate);
@@ -58,6 +62,8 @@ public interface RetailerService {
 	
 	// STORE
 	
+    Store getStoreById(Long storeId);
+    
 	Store getStoreById(String storeId);
 
 	Store getStoreByCode(String storeCode);

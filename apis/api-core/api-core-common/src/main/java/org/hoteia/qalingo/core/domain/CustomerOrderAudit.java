@@ -205,4 +205,50 @@ public class CustomerOrderAudit extends AbstractEntity {
 		this.dateUpdate = dateUpdate;
 	}
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((customerId == null) ? 0 : customerId.hashCode());
+        result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CustomerOrderAudit other = (CustomerOrderAudit) obj;
+        if (customerId == null) {
+            if (other.customerId != null)
+                return false;
+        } else if (!customerId.equals(other.customerId))
+            return false;
+        if (dateCreate == null) {
+            if (other.dateCreate != null)
+                return false;
+        } else if (!dateCreate.equals(other.dateCreate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerOrderAudit [id=" + id + ", version=" + version + ", customerId=" + customerId + ", lastOrderDate=" + lastOrderDate + ", dayProductAudit=" + dayProductAudit
+                + ", weekProductAudit=" + weekProductAudit + ", monthProductAudit=" + monthProductAudit + ", calendarYearProductAudit=" + calendarYearProductAudit + ", specificYearProductAudit="
+                + specificYearProductAudit + ", dayOrderAmountAudit=" + dayOrderAmountAudit + ", weekOrderAmountAudit=" + weekOrderAmountAudit + ", monthOrderAmountAudit=" + monthOrderAmountAudit
+                + ", calendarYearOrderAmountAudit=" + calendarYearOrderAmountAudit + ", specificYearOrderAmountAudit=" + specificYearOrderAmountAudit + ", dateCreate=" + dateCreate + ", dateUpdate="
+                + dateUpdate + "]";
+    }
+
 }

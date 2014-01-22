@@ -9,12 +9,16 @@
  */
 package org.hoteia.qalingo.core.domain;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 @Entity
@@ -34,22 +38,39 @@ public class ProductSkuStock extends AbstractEntity {
 	@Version
 	@Column(name="VERSION", nullable=false, columnDefinition="int(11) default 1")
 	private int version;
-	
-	@Column(name="STOCK_RESERVED_ECO")
-	private Integer stockReservedEco;
 
-	@Column(name="STOCK_GLOBAL")
-	private Integer stockGlobal;
+    @Column(name="GLOBAL_STOCK_QUANTITY", nullable=false, columnDefinition="int(11) default 0")
+    private int globalStockQuantity;
+
+    @Column(name = "RESERVED_STOCK_WHAREHOUSE", nullable=false, columnDefinition="int(11) default 0")
+    private int reservedStockWharehouse;
+
+    @Column(name="RESERVED_STOCK_ECO", nullable=false, columnDefinition="int(11) default 0")
+    private int reservedStockEco;
+
+    @Column(name="STOCK_USED_BY_ACTIVE_CART", nullable=false, columnDefinition="int(11) default 0")
+    private int stockUsedByActiveCart;
+
+    @Column(name="REORDER_QTY_ALERT", nullable=false, columnDefinition="int(11) default 0")
+    private int reorderQuantityAlert;
+
+	@Column(name="REORDER_QTY_TRIGGER", nullable=false, columnDefinition="int(11) default 0")
+	private int reorderQuantityTrigger;
+
+    @Column(name = "REORDER_NEXT_DATE")
+    private Date reorderNextDate;
+
+	@Column(name="WAREHOUSE_ID")
+	private Long warehouseId;
 	
-	@Column(name="STOCK_PREORDERED")
-	private Integer stockPreordered;
-	
-	@Column(name="MARKET_AREA_ID")
-	private Long marketAreaId;
-	
-	@Column(name="RETAILER_ID")
-	private Long retailerId;
-	
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "DATE_CREATE")
+    private Date dateCreate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "DATE_UPDATE")
+    private Date dateUpdate;
+    
 	public ProductSkuStock() {
 	}
 
@@ -69,44 +90,128 @@ public class ProductSkuStock extends AbstractEntity {
 		this.version = version;
 	}
 
-	public Integer getStockReservedEco() {
-		return stockReservedEco;
-	}
+	public Integer getGlobalStockQuantity() {
+        return globalStockQuantity;
+    }
 
-	public void setStockReservedEco(Integer stockReservedEco) {
-		this.stockReservedEco = stockReservedEco;
-	}
+    public void setGlobalStockQuantity(Integer globalStockQuantity) {
+        this.globalStockQuantity = globalStockQuantity;
+    }
 
-	public Integer getStockGlobal() {
-		return stockGlobal;
-	}
+    public Integer getReservedStockWharehouse() {
+        return reservedStockWharehouse;
+    }
 
-	public void setStockGlobal(Integer stockGlobal) {
-		this.stockGlobal = stockGlobal;
-	}
+    public void setReservedStockWharehouse(Integer reservedStockWharehouse) {
+        this.reservedStockWharehouse = reservedStockWharehouse;
+    }
 
-	public Integer getStockPreordered() {
-		return stockPreordered;
-	}
+    public Integer getReservedStockEco() {
+        return reservedStockEco;
+    }
 
-	public void setStockPreordered(Integer stockPreordered) {
-		this.stockPreordered = stockPreordered;
-	}
+    public void setReservedStockEco(Integer reservedStockEco) {
+        this.reservedStockEco = reservedStockEco;
+    }
 
-	public Long getMarketAreaId() {
-		return marketAreaId;
-	}
+    public Integer getStockUsedByActiveCart() {
+        return stockUsedByActiveCart;
+    }
 
-	public void setMarketAreaId(Long marketAreaId) {
-		this.marketAreaId = marketAreaId;
-	}
-	
-	public Long getRetailerId() {
-		return retailerId;
-	}
-	
-	public void setRetailerId(Long retailerId) {
-		this.retailerId = retailerId;
-	}
+    public void setStockUsedByActiveCart(Integer stockUsedByActiveCart) {
+        this.stockUsedByActiveCart = stockUsedByActiveCart;
+    }
+
+    public Integer getReorderQuantityAlert() {
+        return reorderQuantityAlert;
+    }
+
+    public void setReorderQuantityAlert(Integer reorderQuantityAlert) {
+        this.reorderQuantityAlert = reorderQuantityAlert;
+    }
+
+    public Integer getReorderQuantityTrigger() {
+        return reorderQuantityTrigger;
+    }
+
+    public void setReorderQuantityTrigger(Integer reorderQuantityTrigger) {
+        this.reorderQuantityTrigger = reorderQuantityTrigger;
+    }
+
+    public Date getReorderNextDate() {
+        return reorderNextDate;
+    }
+
+    public void setReorderNextDate(Date reorderNextDate) {
+        this.reorderNextDate = reorderNextDate;
+    }
+
+    public Long getWarehouseId() {
+        return warehouseId;
+    }
+    
+    public void setWarehouseId(Long warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public Date getDateCreate() {
+        return dateCreate;
+    }
+
+    public void setDateCreate(Date dateCreate) {
+        this.dateCreate = dateCreate;
+    }
+
+    public Date getDateUpdate() {
+        return dateUpdate;
+    }
+
+    public void setDateUpdate(Date dateUpdate) {
+        this.dateUpdate = dateUpdate;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((warehouseId == null) ? 0 : warehouseId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ProductSkuStock other = (ProductSkuStock) obj;
+        if (dateCreate == null) {
+            if (other.dateCreate != null)
+                return false;
+        } else if (!dateCreate.equals(other.dateCreate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (warehouseId == null) {
+            if (other.warehouseId != null)
+                return false;
+        } else if (!warehouseId.equals(other.warehouseId))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductSkuStock [id=" + id + ", version=" + version + ", globalStockQuantity=" + globalStockQuantity + ", reservedStockWharehouse=" + reservedStockWharehouse + ", reservedStockEco="
+                + reservedStockEco + ", stockUsedByActiveCart=" + stockUsedByActiveCart + ", reorderQuantityAlert=" + reorderQuantityAlert + ", reorderQuantityTrigger=" + reorderQuantityTrigger
+                + ", reorderNextDate=" + reorderNextDate + ", warehouseId=" + warehouseId + ", dateCreate=" + dateCreate + ", dateUpdate=" + dateUpdate + "]";
+    }
 
 }

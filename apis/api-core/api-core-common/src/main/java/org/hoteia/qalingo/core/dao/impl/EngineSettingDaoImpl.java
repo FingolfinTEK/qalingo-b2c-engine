@@ -32,7 +32,7 @@ public class EngineSettingDaoImpl extends AbstractGenericDaoImpl implements Engi
 
 	// Engine Setting
 	public EngineSetting getEngineSettingById(final Long engineSettingId) {
-        Criteria criteria = getSession().createCriteria(EngineSetting.class);
+        Criteria criteria = createDefaultCriteria(EngineSetting.class);
         criteria.add(Restrictions.eq("id", engineSettingId));
         
         addDefaultFetch(criteria);
@@ -42,7 +42,7 @@ public class EngineSettingDaoImpl extends AbstractGenericDaoImpl implements Engi
 	}
 	
 	public EngineSetting getEngineSettingByCode(final String code) {
-        Criteria criteria = getSession().createCriteria(EngineSetting.class);
+        Criteria criteria = createDefaultCriteria(EngineSetting.class);
         criteria.add(Restrictions.eq("code", code));
         
         addDefaultFetch(criteria);
@@ -52,7 +52,7 @@ public class EngineSettingDaoImpl extends AbstractGenericDaoImpl implements Engi
 	}
 	
 	public List<EngineSetting> findEngineSettings() {
-        Criteria criteria = getSession().createCriteria(EngineSetting.class);
+        Criteria criteria = createDefaultCriteria(EngineSetting.class);
         
         addDefaultFetch(criteria);
         
@@ -64,12 +64,22 @@ public class EngineSettingDaoImpl extends AbstractGenericDaoImpl implements Engi
 		return engineSettings;
 	}
 	
-	public void saveEngineSetting(EngineSetting engineSetting) {
+	public EngineSetting saveEngineSetting(EngineSetting engineSetting) {
 		if(engineSetting.getDateCreate() == null){
 			engineSetting.setDateCreate(new Date());
 		}
 		engineSetting.setDateUpdate(new Date());
-		em.merge(engineSetting);
+        if (engineSetting.getId() != null) {
+            if(em.contains(engineSetting)){
+                em.refresh(engineSetting);
+            }
+            EngineSetting mergedEngineSetting = em.merge(engineSetting);
+            em.flush();
+            return mergedEngineSetting;
+        } else {
+            em.persist(engineSetting);
+            return engineSetting;
+        }
 	}
 
 	public void deleteEngineSetting(EngineSetting engineSetting) {
@@ -81,20 +91,30 @@ public class EngineSettingDaoImpl extends AbstractGenericDaoImpl implements Engi
 		return em.find(EngineSettingValue.class, id);
 	}
 	
-	public void saveOrUpdateEngineSettingValue(EngineSettingValue engineSettingValue) {
+	public EngineSettingValue saveOrUpdateEngineSettingValue(EngineSettingValue engineSettingValue) {
 		if(engineSettingValue.getDateCreate() == null){
 			engineSettingValue.setDateCreate(new Date());
 		}
 		engineSettingValue.setDateUpdate(new Date());
-		if(engineSettingValue.getId() == null){
-			em.persist(engineSettingValue);
-		} else {
-			em.merge(engineSettingValue);
-		}
+        if (engineSettingValue.getId() != null) {
+            if(em.contains(engineSettingValue)){
+                em.refresh(engineSettingValue);
+            }
+            EngineSettingValue mergedEngineSettingValue = em.merge(engineSettingValue);
+            em.flush();
+            return mergedEngineSettingValue;
+        } else {
+            em.persist(engineSettingValue);
+            return engineSettingValue;
+        }
 	}
 	
     private void addDefaultFetch(Criteria criteria) {
         criteria.setFetchMode("engineSettingValues", FetchMode.JOIN); 
+    }
+    
+    public void deleteEngineSettingValue(EngineSettingValue engineSettingValue) {
+        em.remove(engineSettingValue);
     }
 
 }

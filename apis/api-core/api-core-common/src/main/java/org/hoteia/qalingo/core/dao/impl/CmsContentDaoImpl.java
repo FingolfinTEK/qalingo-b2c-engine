@@ -27,25 +27,31 @@ public class CmsContentDaoImpl extends AbstractGenericDaoImpl implements CmsCont
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public CmsContent getCmsContentById(final Long cmsContentId) {
-        Criteria criteria = getSession().createCriteria(CmsContent.class);
+        Criteria criteria = createDefaultCriteria(CmsContent.class);
         criteria.add(Restrictions.eq("id", cmsContentId));
         CmsContent cmsContent = (CmsContent) criteria.uniqueResult();
         return cmsContent;
 	}
 
-	public void saveOrUpdateCmsContent(CmsContent cmsContent) {
+	public CmsContent saveOrUpdateCmsContent(final CmsContent cmsContent) {
 		if(cmsContent.getDateCreate() == null){
 			cmsContent.setDateCreate(new Date());
 		}
 		cmsContent.setDateUpdate(new Date());
-		if(cmsContent.getId() == null){
-			em.persist(cmsContent);
-		} else {
-			em.merge(cmsContent);
-		}
+        if (cmsContent.getId() != null) {
+            if(em.contains(cmsContent)){
+                em.refresh(cmsContent);
+            }
+            CmsContent mergedCmsContent = em.merge(cmsContent);
+            em.flush();
+            return mergedCmsContent;
+        } else {
+            em.persist(cmsContent);
+            return cmsContent;
+        }
 	}
 
-	public void deleteCmsContent(CmsContent cmsContent) {
+	public void deleteCmsContent(final CmsContent cmsContent) {
 		em.remove(cmsContent);
 	}
 

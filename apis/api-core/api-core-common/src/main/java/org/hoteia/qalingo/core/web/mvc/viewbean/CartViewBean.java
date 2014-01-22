@@ -20,27 +20,46 @@ public class CartViewBean extends AbstractViewBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 8804558925159158979L;
 
+    boolean withItemQuantityActions = false;
+    boolean withPromoCode = false;
+
 	private String cartDetailsUrl;
 	private String cartAuthUrl;
 	private String cartDeliveryAndOrderDetailsUrl;
 	private String cartOrderPaymentUrl;
 	private String cartOrderConfirmationUrl;
-
+	
 	private String addNewAddressUrl;
 
-	private String cartItemsTotal;
-	private String cartShippingTotal;
-	private String cartFeesTotal;
-	private String cartTotal;
+	private String cartItemsTotalWithCurrencySign;
+	private String cartShippingTotalWithCurrencySign;
+	private String cartFeesTotalWithCurrencySign;
+	private String cartTotalWithCurrencySign;
 	
 	private List<CartItemViewBean> cartItems = new ArrayList<CartItemViewBean>();
-	private List<CartShippingViewBean> cartShippings = new ArrayList<CartShippingViewBean>();
+	private List<CartDeliveryMethodViewBean> cartDeliveryMethods = new ArrayList<CartDeliveryMethodViewBean>();
 	private List<CartTaxViewBean> cartTaxes = new ArrayList<CartTaxViewBean>();
 
 	public CartViewBean() {
 	}
 
-	public String getCartDetailsUrl() {
+	public boolean isWithItemQuantityActions() {
+        return withItemQuantityActions;
+    }
+
+    public void setWithItemQuantityActions(boolean withItemQuantityActions) {
+        this.withItemQuantityActions = withItemQuantityActions;
+    }
+
+    public boolean isWithPromoCode() {
+        return withPromoCode;
+    }
+
+    public void setWithPromoCode(boolean withPromoCode) {
+        this.withPromoCode = withPromoCode;
+    }
+
+    public String getCartDetailsUrl() {
 		return cartDetailsUrl;
 	}
 
@@ -89,39 +108,39 @@ public class CartViewBean extends AbstractViewBean implements Serializable {
 		this.addNewAddressUrl = addNewAddressUrl;
 	}
 	
-	public String getCartItemsTotal() {
-		return cartItemsTotal;
-	}
+	public String getCartItemsTotalWithCurrencySign() {
+        return cartItemsTotalWithCurrencySign;
+    }
 
-	public void setCartItemsTotal(String cartItemsTotal) {
-		this.cartItemsTotal = cartItemsTotal;
-	}
+    public void setCartItemsTotalWithCurrencySign(String cartItemsTotalWithCurrencySign) {
+        this.cartItemsTotalWithCurrencySign = cartItemsTotalWithCurrencySign;
+    }
 
-	public String getCartShippingTotal() {
-		return cartShippingTotal;
-	}
+    public String getCartShippingTotalWithCurrencySign() {
+        return cartShippingTotalWithCurrencySign;
+    }
 
-	public void setCartShippingTotal(String cartShippingTotal) {
-		this.cartShippingTotal = cartShippingTotal;
-	}
+    public void setCartShippingTotalWithCurrencySign(String cartShippingTotalWithCurrencySign) {
+        this.cartShippingTotalWithCurrencySign = cartShippingTotalWithCurrencySign;
+    }
 
-	public String getCartFeesTotal() {
-		return cartFeesTotal;
-	}
+    public String getCartFeesTotalWithCurrencySign() {
+        return cartFeesTotalWithCurrencySign;
+    }
 
-	public void setCartFeesTotal(String cartFeesTotal) {
-		this.cartFeesTotal = cartFeesTotal;
-	}
+    public void setCartFeesTotalWithCurrencySign(String cartFeesTotalWithCurrencySign) {
+        this.cartFeesTotalWithCurrencySign = cartFeesTotalWithCurrencySign;
+    }
 
-	public String getCartTotal() {
-		return cartTotal;
-	}
+    public String getCartTotalWithCurrencySign() {
+        return cartTotalWithCurrencySign;
+    }
 
-	public void setCartTotal(String cartTotal) {
-		this.cartTotal = cartTotal;
-	}
+    public void setCartTotalWithCurrencySign(String cartTotalWithCurrencySign) {
+        this.cartTotalWithCurrencySign = cartTotalWithCurrencySign;
+    }
 
-	public List<CartItemViewBean> getCartItems() {
+    public List<CartItemViewBean> getCartItems() {
 		return cartItems;
 	}
 	
@@ -129,13 +148,27 @@ public class CartViewBean extends AbstractViewBean implements Serializable {
 		this.cartItems = cartItems;
 	}
 	
-	public List<CartShippingViewBean> getCartShippings() {
-		return cartShippings;
+    public int getTotalCartItems() {
+        if (cartItems != null) {
+            return cartItems.size();
+        }
+        return 0;
+    }
+	
+	public List<CartDeliveryMethodViewBean> getCartDeliveryMethods() {
+		return cartDeliveryMethods;
 	}
 	
-	public void setCartShippings(List<CartShippingViewBean> cartShippings) {
-		this.cartShippings = cartShippings;
+	public void setCartDeliveryMethods(List<CartDeliveryMethodViewBean> cartDeliveryMethods) {
+		this.cartDeliveryMethods = cartDeliveryMethods;
 	}
+	
+    public int getTotalDeliveryMethods() {
+        if (cartDeliveryMethods != null) {
+            return cartDeliveryMethods.size();
+        }
+        return 0;
+    }
 	
 	public List<CartTaxViewBean> getCartTaxes() {
 		return cartTaxes;
@@ -144,5 +177,12 @@ public class CartViewBean extends AbstractViewBean implements Serializable {
 	public void setCartTaxes(List<CartTaxViewBean> cartTaxes) {
 		this.cartTaxes = cartTaxes;
 	}
+	
+    public int getTotalCartTaxes() {
+        if (cartTaxes != null) {
+            return cartTaxes.size();
+        }
+        return 0;
+    }
 	
 }

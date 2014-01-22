@@ -13,12 +13,14 @@ import java.util.List;
 
 import org.hoteia.qalingo.core.domain.CatalogCategoryMaster;
 import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
-import org.hoteia.qalingo.core.domain.ProductMarketing;
 
 public interface CatalogCategoryService {
 
 	// MASTER
-	CatalogCategoryMaster getMasterCatalogCategoryById(String catalogCategoryId);
+    
+    CatalogCategoryMaster getMasterCatalogCategoryById(Long catalogCategoryId);
+
+    CatalogCategoryMaster getMasterCatalogCategoryById(String catalogCategoryId);
 
 	CatalogCategoryMaster getMasterCatalogCategoryByCode(String catalogCategoryCode);
 
@@ -36,19 +38,21 @@ public interface CatalogCategoryService {
 
 	// VIRTUAL
 	
+    CatalogCategoryVirtual getVirtualCatalogCategoryById(Long catalogCategoryId);
+    
 	CatalogCategoryVirtual getVirtualCatalogCategoryById(String catalogCategoryId);
 
 	CatalogCategoryVirtual getVirtualCatalogCategoryByCode(String catalogCategoryCode);
 
 	CatalogCategoryVirtual getVirtualCatalogCategoryByCode(Long marketAreaId, String catalogCategoryCode);
 
-	CatalogCategoryVirtual getDefaultVirtualCatalogCategoryByProductMarketing(Long marketAreaId, ProductMarketing productMarketing);
+	CatalogCategoryVirtual getDefaultVirtualCatalogCategoryByProductMarketing(Long marketAreaId, String productMarketingCode);
 	
 	List<CatalogCategoryVirtual> findRootVirtualCatalogCategories(Long marketAreaId);
 
 	List<CatalogCategoryVirtual> findVirtualCategories(Long marketAreaId);
 
-	List<CatalogCategoryVirtual> findVirtualCategoriesByProductMarketingId(Long marketAreaId, Long productMarketingId);
+	List<CatalogCategoryVirtual> findVirtualCategoriesByProductMarketingId(Long marketAreaId, String productMarketingCode);
 
 	List<CatalogCategoryVirtual> orderCategoryVirtualList(Long marketAreaId, List<CatalogCategoryVirtual> categories);
 

@@ -92,8 +92,8 @@ public class OrderController extends AbstractBusinessBackofficeController {
 	public ModelAndView orderDetails(final HttpServletRequest request, final Model model) throws Exception {
 		ModelAndViewThemeDevice modelAndView = new ModelAndViewThemeDevice(getCurrentVelocityPath(request), BoUrls.ORDER_DETAILS.getVelocityPage());
 
-		final String currentOrderCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_ORDER_CODE);
-		final OrderCustomer orderCustomer = orderCustomerService.getOrderById(currentOrderCode);
+		final String orderNum = request.getParameter(RequestConstants.REQUEST_PARAMETER_ORDER_NUM);
+		final OrderCustomer orderCustomer = orderCustomerService.getOrderByOrderNum(orderNum);
 		
 		if(orderCustomer != null){
 			initOrderDetailsPage(request, model, modelAndView, orderCustomer);
@@ -122,6 +122,7 @@ public class OrderController extends AbstractBusinessBackofficeController {
 	}
     
 	protected void initOrderDetailsPage(final HttpServletRequest request, final Model model, final ModelAndViewThemeDevice modelAndView, final OrderCustomer user) throws Exception{
-		modelAndView.addObject(Constants.ORDER_VIEW_BEAN, backofficeViewBeanFactory.buildOrderViewBean(requestUtil.getRequestData(request), user));
+		modelAndView.addObject(ModelConstants.ORDER_VIEW_BEAN, backofficeViewBeanFactory.buildOrderViewBean(requestUtil.getRequestData(request), user));
 	}
+
 }

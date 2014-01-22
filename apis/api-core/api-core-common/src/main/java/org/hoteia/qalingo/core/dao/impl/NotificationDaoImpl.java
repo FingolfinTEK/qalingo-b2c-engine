@@ -30,14 +30,14 @@ public class NotificationDaoImpl extends AbstractGenericDaoImpl implements Notif
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public Notification getNotificationById(final Long notificationId) {
-        Criteria criteria = getSession().createCriteria(Notification.class);
+        Criteria criteria = createDefaultCriteria(Notification.class);
         criteria.add(Restrictions.eq("id", notificationId));
         Notification notification = (Notification) criteria.uniqueResult();
         return notification;
 	}
 	
 	public List<Notification> findNotifications() {
-        Criteria criteria = getSession().createCriteria(Notification.class);
+        Criteria criteria = createDefaultCriteria(Notification.class);
         
         criteria.addOrder(Order.asc("id"));
 
@@ -48,7 +48,7 @@ public class NotificationDaoImpl extends AbstractGenericDaoImpl implements Notif
 	}
 	
 	public List<Notification> findNotificationByCustomerId(final Long customerId) {
-        Criteria criteria = getSession().createCriteria(Notification.class);
+        Criteria criteria = createDefaultCriteria(Notification.class);
         criteria.add(Restrictions.eq("customerId", customerId));
         
         criteria.addOrder(Order.asc("isChecked"));
@@ -61,7 +61,7 @@ public class NotificationDaoImpl extends AbstractGenericDaoImpl implements Notif
 	}
 	
 	public List<Notification> findNewNotificationByCustomerId(final Long customerId) {
-        Criteria criteria = getSession().createCriteria(Notification.class);
+        Criteria criteria = createDefaultCriteria(Notification.class);
         
         criteria.addOrder(Order.asc("createdDate"));
 
@@ -72,7 +72,7 @@ public class NotificationDaoImpl extends AbstractGenericDaoImpl implements Notif
 	}
 	
 	public List<Notification> findIdsForSync() {
-        Criteria criteria = getSession().createCriteria(Notification.class);
+        Criteria criteria = createDefaultCriteria(Notification.class);
         
         criteria.addOrder(Order.asc("id"));
 
@@ -88,19 +88,25 @@ public class NotificationDaoImpl extends AbstractGenericDaoImpl implements Notif
 		session.createSQLQuery(query).executeUpdate();
 	}
 
-	public void saveOrUpdateNotification(Notification notification) {
+	public Notification saveOrUpdateNotification(final Notification notification) {
 		if(notification.getDateCreate() == null){
 			notification.setDateCreate(new Date());
 		}
 		notification.setDateUpdate(new Date());
-		if(notification.getId() == null){
-			em.persist(notification);
-		} else {
-			em.merge(notification);
-		}
+        if (notification.getId() != null) {
+            if(em.contains(notification)){
+                em.refresh(notification);
+            }
+            Notification mergedNotification = em.merge(notification);
+            em.flush();
+            return mergedNotification;
+        } else {
+            em.persist(notification);
+            return notification;
+        }
 	}
 
-	public void deleteNotification(Notification notification) {
+	public void deleteNotification(final Notification notification) {
 		em.remove(notification);
 	}
 

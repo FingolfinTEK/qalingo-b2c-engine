@@ -222,6 +222,22 @@ public class ProductMarketingViewBean extends AbstractViewBean implements Serial
         }
         return null;
     }
+    
+    public String getSkuCode(){
+    	if(productSkus != null){
+            for (Iterator<ProductSkuViewBean> iterator = productSkus.iterator(); iterator.hasNext();) {
+                ProductSkuViewBean productSkuViewBean = (ProductSkuViewBean) iterator.next();
+                if(productSkuViewBean.isDefault()){
+                    return productSkuViewBean.getCode();
+                }
+            }
+            if(!productSkus.isEmpty()){
+                ProductSkuViewBean productSkuViewBean = productSkus.get(0);
+                return productSkuViewBean.getCode();
+            }
+        }
+        return null;
+    }
 
     public String getAddToWishlistUrl() {
         if(productSkus != null){
@@ -234,6 +250,26 @@ public class ProductMarketingViewBean extends AbstractViewBean implements Serial
             if(!productSkus.isEmpty()){
                 ProductSkuViewBean productSkuViewBean = productSkus.get(0);
                 return productSkuViewBean.getAddToWishlistUrl();
+            }
+        }
+        return null;
+    }
+    
+    public String getPriceWithCurrencySign(){
+    	if(productSkus != null){
+            for (Iterator<ProductSkuViewBean> iterator = productSkus.iterator(); iterator.hasNext();) {
+                ProductSkuViewBean productSkuViewBean = (ProductSkuViewBean) iterator.next();
+                if(productSkuViewBean.isDefault()){
+                	if(productSkuViewBean.getPriceWithCurrencySign() != null){
+	                	return productSkuViewBean.getPriceWithCurrencySign();
+                	}
+                }
+            }
+            if(!productSkus.isEmpty()){
+                ProductSkuViewBean productSkuViewBean = productSkus.get(0);
+                if(productSkuViewBean != null && productSkuViewBean.getPriceWithCurrencySign() != null){
+                	return productSkuViewBean.getPriceWithCurrencySign(); 
+                }
             }
         }
         return null;

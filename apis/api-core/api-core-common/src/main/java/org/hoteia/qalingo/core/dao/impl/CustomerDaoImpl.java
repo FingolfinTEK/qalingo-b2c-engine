@@ -19,6 +19,7 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hoteia.qalingo.core.dao.CustomerDao;
 import org.hoteia.qalingo.core.domain.Customer;
 import org.hoteia.qalingo.core.domain.CustomerAttribute;
@@ -32,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerDao {
 
 	public Customer getCustomerById(final Long customerId) {
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = createDefaultCriteria(Customer.class);
         
         addDefaultFetch(criteria);
 
@@ -42,7 +43,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	}
 	
 	public Customer getCustomerByCode(final String code) {
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = createDefaultCriteria(Customer.class);
         
         addDefaultFetch(criteria);
 
@@ -52,7 +53,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	}
 	
 	public Customer getCustomerByPermalink(final String permalink) {
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = createDefaultCriteria(Customer.class);
         
         addDefaultFetch(criteria);
 
@@ -62,7 +63,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	}
 
 	public Customer getCustomerByLoginOrEmail(final String usernameOrEmail) {
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = createDefaultCriteria(Customer.class);
         
         addDefaultFetch(criteria);
 
@@ -72,7 +73,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	}
 	
 	public List<Customer> findCustomers() {
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = createDefaultCriteria(Customer.class);
         
         addDefaultFetch(criteria);
         
@@ -85,7 +86,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 		return customers;
 	}
 	
-	public void saveOrUpdateCustomer(final Customer customer) throws Exception {
+	public Customer saveOrUpdateCustomer(final Customer customer) throws Exception {
 		if(customer.getDateCreate() == null){
 			customer.setDateCreate(new Date());
 			customer.setActive(true);
@@ -112,8 +113,17 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	        	throw new CustomerAttributeException("Market Area can't be null if Attribute is not global!");
 	        }
         }
-		
-		em.merge(customer);
+        if (customer.getId() != null) {
+            if(em.contains(customer)){
+                em.refresh(customer);
+            }
+            Customer mergedCustomer = em.merge(customer);
+            em.flush();
+            return mergedCustomer;
+        } else {
+            em.persist(customer);
+            return customer;
+        }
 	}
 
 	public void deleteCustomer(final Customer customer) {
@@ -122,7 +132,7 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 	
 	// CREDENTIAL
 	
-	public void saveOrUpdateCustomerCredential(final CustomerCredential customerCredential) throws Exception {
+	public CustomerCredential saveOrUpdateCustomerCredential(final CustomerCredential customerCredential) throws Exception {
 		if(customerCredential.getDateCreate() == null){
 			customerCredential.setDateCreate(new Date());
 			if(StringUtils.isEmpty(customerCredential.getResetToken())){
@@ -130,23 +140,39 @@ public class CustomerDaoImpl extends AbstractGenericDaoImpl implements CustomerD
 			}
 		}
 		customerCredential.setDateUpdate(new Date());
-		
-		if(customerCredential.getId() == null){
-			em.persist(customerCredential);
-		} else {
-			em.merge(customerCredential);
-		}
+        if (customerCredential.getId() != null) {
+            if(em.contains(customerCredential)){
+                em.refresh(customerCredential);
+            }
+            CustomerCredential mergedCustomerCredential = em.merge(customerCredential);
+            em.flush();
+            return mergedCustomerCredential;
+        } else {
+            em.persist(customerCredential);
+            return customerCredential;
+        }
 	}
 	
     private void addDefaultFetch(Criteria criteria) {
-        criteria.setFetchMode("credentials", FetchMode.JOIN); 
-        criteria.setFetchMode("addresses", FetchMode.JOIN); 
-        criteria.setFetchMode("connectionLogs", FetchMode.JOIN); 
-        criteria.setFetchMode("customerMarketAreas", FetchMode.JOIN); 
-        criteria.setFetchMode("customerAttributes", FetchMode.JOIN); 
-        criteria.setFetchMode("customerGroups", FetchMode.JOIN); 
-        criteria.setFetchMode("oauthAccesses", FetchMode.JOIN); 
-        criteria.setFetchMode("customerOrderAudit", FetchMode.JOIN); 
+        criteria.setFetchMode("credentials", FetchMode.JOIN);
+        criteria.setFetchMode("addresses", FetchMode.JOIN);
+        criteria.setFetchMode("connectionLogs", FetchMode.JOIN);
+        
+        criteria.setFetchMode("customerMarketAreas", FetchMode.JOIN);
+
+        criteria.createAlias("customerMarketAreas.optins", "optins", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("optins", FetchMode.JOIN);
+        
+        criteria.createAlias("customerMarketAreas.wishlistProducts", "wishlistProducts", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("wishlistProducts", FetchMode.JOIN);
+
+        criteria.createAlias("customerMarketAreas.productComments", "productComments", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("productComments", FetchMode.JOIN);
+        
+        criteria.setFetchMode("customerAttributes", FetchMode.JOIN);
+        criteria.setFetchMode("customerGroups", FetchMode.JOIN);
+        criteria.setFetchMode("oauthAccesses", FetchMode.JOIN);
+        criteria.setFetchMode("customerOrderAudit", FetchMode.JOIN);
     }
 
 }

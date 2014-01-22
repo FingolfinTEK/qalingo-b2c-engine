@@ -25,15 +25,18 @@ public class CommonViewBean extends AbstractViewBean implements Serializable {
 	protected String forgottenPasswordUrl;
 	protected String logoutUrl;
 	protected String createAccountUrl;
+    protected String checkoutCreateAccountUrl;
 	protected String customerDetailsUrl;
     protected String personalDetailsUrl;
 	protected String contactUrl;
+    protected String contextJsonUrl;
 
 	protected MarketPlaceViewBean currentMarketPlace;
 	protected MarketViewBean currentMarket;
 	protected MarketAreaViewBean currentMarketArea;
 	protected LocalizationViewBean currentMarketAreaLocalization;
     protected RetailerViewBean currentMarketAreaRetailer;
+    protected CurrencyReferentialViewBean currentMarketAreaCurrency;
 
 	public String getThemeResourcePrefixPath() {
 		return themeResourcePrefixPath;
@@ -82,6 +85,14 @@ public class CommonViewBean extends AbstractViewBean implements Serializable {
 	public void setCreateAccountUrl(String createAccountUrl) {
 		this.createAccountUrl = createAccountUrl;
 	}
+	
+	public String getCheckoutCreateAccountUrl() {
+        return checkoutCreateAccountUrl;
+    }
+	
+	public void setCheckoutCreateAccountUrl(String checkoutCreateAccountUrl) {
+        this.checkoutCreateAccountUrl = checkoutCreateAccountUrl;
+    }
 
 	public String getCustomerDetailsUrl() {
 		return customerDetailsUrl;
@@ -106,6 +117,14 @@ public class CommonViewBean extends AbstractViewBean implements Serializable {
 	public void setContactUrl(String contactUrl) {
 		this.contactUrl = contactUrl;
 	}
+	
+	public String getContextJsonUrl() {
+        return contextJsonUrl;
+    }
+	
+	public void setContextJsonUrl(String contextJsonUrl) {
+        this.contextJsonUrl = contextJsonUrl;
+    }
 
 	public MarketPlaceViewBean getCurrentMarketPlace() {
 		return currentMarketPlace;
@@ -145,6 +164,14 @@ public class CommonViewBean extends AbstractViewBean implements Serializable {
 	
 	public void setCurrentMarketAreaRetailer(RetailerViewBean currentMarketAreaRetailer) {
         this.currentMarketAreaRetailer = currentMarketAreaRetailer;
+    }
+	
+	public CurrencyReferentialViewBean getCurrentMarketAreaCurrency() {
+        return currentMarketAreaCurrency;
+    }
+	
+	public void setCurrentMarketAreaCurrency(CurrencyReferentialViewBean currentMarketAreaCurrency) {
+        this.currentMarketAreaCurrency = currentMarketAreaCurrency;
     }
 	
 }

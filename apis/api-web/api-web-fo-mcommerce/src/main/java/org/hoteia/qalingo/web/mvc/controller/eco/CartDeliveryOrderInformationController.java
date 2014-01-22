@@ -48,63 +48,101 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller("cartDeliveryOrderInformationController")
 public class CartDeliveryOrderInformationController extends AbstractMCommerceController {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	@RequestMapping(value = FoUrls.CART_DELIVERY_URL, method = RequestMethod.GET)
-	public ModelAndView displayOrderDelivery(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-		ModelAndViewThemeDevice modelAndView = new ModelAndViewThemeDevice(getCurrentVelocityPath(request), FoUrls.CART_DELIVERY.getVelocityPage());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-		// SANITY CHECK
-		final Cart currentCart = requestUtil.getCurrentCart(request);
-		int cartItemsCount = currentCart.getCartItems().size();
-		if(cartItemsCount == 0){
-			return new ModelAndView(new RedirectView(urlService.generateUrl(FoUrls.HOME, requestUtil.getRequestData(request))));
-		}
-		
+    @RequestMapping(value = FoUrls.CART_DELIVERY_URL, method = RequestMethod.GET)
+    public ModelAndView displayOrderDelivery(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+        ModelAndViewThemeDevice modelAndView = new ModelAndViewThemeDevice(getCurrentVelocityPath(request), FoUrls.CART_DELIVERY.getVelocityPage());
+
+        // SANITY CHECK
+        final RequestData requestData = requestUtil.getRequestData(request);
+        final Cart currentCart = requestData.getCart();
+        if (currentCart != null && currentCart.getTotalCartItems() == 0) {
+            return new ModelAndView(new RedirectView(urlService.generateUrl(FoUrls.CART_DETAILS, requestUtil.getRequestData(request))));
+        }
+
+        final CartViewBean cartViewBean = frontofficeViewBeanFactory.buildCartViewBean(requestUtil.getRequestData(request), currentCart);
+        modelAndView.addObject(ModelConstants.CART_VIEW_BEAN, cartViewBean);
+
+        modelAndView.addObject(ModelConstants.CHECKOUT_STEP, 3);
+
+        modelAndView.addObject(ModelConstants.CART_FORM, formFactory.buildCartForm(requestData));
+
+        return modelAndView;
+    }
+
+    @RequestMapping(value = FoUrls.CART_DELIVERY_URL, method = RequestMethod.POST)
+    public ModelAndView submitOrderDelivery(final HttpServletRequest request, final HttpServletResponse response, @Valid CartForm cartForm, 
+                                            BindingResult result, ModelMap modelMap) throws Exception {
         final RequestData requestData = requestUtil.getRequestData(request);
         
-		final CartViewBean cartViewBean = frontofficeViewBeanFactory.buildCartViewBean(requestUtil.getRequestData(request), currentCart);
-		modelAndView.addObject(ModelConstants.CART_VIEW_BEAN, cartViewBean);
-		
-		modelAndView.addObject(ModelConstants.CART_FORM, formFactory.buildCartForm(requestData));
-		
-        return modelAndView;
-	}
+        // SANITY CHECK
+        final Cart currentCart = requestData.getCart();
+        if (currentCart.getTotalCartItems() == 0) {
+            return new ModelAndView(new RedirectView(urlService.generateUrl(FoUrls.CART_DETAILS, requestUtil.getRequestData(request))));
+        }
 
-	@RequestMapping(value = FoUrls.CART_DELIVERY_URL, method = RequestMethod.POST)
-	public ModelAndView submitOrderDelivery(final HttpServletRequest request, final HttpServletResponse response, @Valid CartForm cartForm,
-								BindingResult result, ModelMap modelMap) throws Exception {
-		
-		if (result.hasErrors()) {
-			return displayOrderDelivery(request, response);
-		}
-		
-		requestUtil.updateCurrentCart(request, Long.parseLong(cartForm.getBillingAddressId()), Long.parseLong(cartForm.getShippingAddressId()));
-		
-		final String urlRedirect = urlService.generateUrl(FoUrls.CART_ORDER_PAYMENT, requestUtil.getRequestData(request));
+        if (result.hasErrors()) {
+            return displayOrderDelivery(request, response);
+        }
+
+        if (currentCart.getDeliveryMethods() == null) {
+            addErrorMessage(request, "DELIVERY");
+            return displayOrderDelivery(request, response);
+        }
+
+        webManagementService.updateCart(requestData, Long.parseLong(cartForm.getBillingAddressId()), Long.parseLong(cartForm.getShippingAddressId()));
+
+        final String urlRedirect = urlService.generateUrl(FoUrls.CART_ORDER_PAYMENT, requestUtil.getRequestData(request));
         return new ModelAndView(new RedirectView(urlRedirect));
-	}
-
-    @ModelAttribute(ModelConstants.ADDRESSES_VIEW_BEAN)
-    public List<CustomerAddressViewBean> getAddresses(HttpServletRequest request) {
-		List<CustomerAddressViewBean> addressesValues = new ArrayList<CustomerAddressViewBean>();
-		try {
-			final Customer customer = requestUtil.getCurrentCustomer(request);
-			Set<CustomerAddress> addresses = customer.getAddresses();
-			for (Iterator<CustomerAddress> iterator = addresses.iterator(); iterator.hasNext();) {
-				final CustomerAddress customerAddress = (CustomerAddress) iterator.next();
-				addressesValues.add(frontofficeViewBeanFactory.buildCustomeAddressViewBean(requestUtil.getRequestData(request), customerAddress));
-			}
-			
-			Collections.sort(addressesValues, new Comparator<CustomerAddressViewBean>() {
-				@Override
-				public int compare(CustomerAddressViewBean o1, CustomerAddressViewBean o2) {
-					return o1.getAddressName().compareTo(o2.getAddressName());
-				}
-			});
-		} catch (Exception e) {
-			logger.error("", e);
-		}
-		return addressesValues;
     }
+
+    @ModelAttribute(ModelConstants.BILLING_ADDRESSES_VIEW_BEAN)
+    public List<CustomerAddressViewBean> getBillingAddresses(HttpServletRequest request) {
+        List<CustomerAddressViewBean> addressesValues = new ArrayList<CustomerAddressViewBean>();
+        try {
+            final RequestData requestData = requestUtil.getRequestData(request);
+            final Customer customer = requestData.getCustomer();
+            Set<CustomerAddress> addresses = customer.getAddresses();
+            for (Iterator<CustomerAddress> iterator = addresses.iterator(); iterator.hasNext();) {
+                final CustomerAddress customerAddress = (CustomerAddress) iterator.next();
+                addressesValues.add(frontofficeViewBeanFactory.buildCustomeAddressViewBean(requestData, customerAddress));
+            }
+
+            Collections.sort(addressesValues, new Comparator<CustomerAddressViewBean>() {
+                @Override
+                public int compare(CustomerAddressViewBean o1, CustomerAddressViewBean o2) {
+                    return o1.getAddressName().compareTo(o2.getAddressName());
+                }
+            });
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+        return addressesValues;
+    }
+    
+    @ModelAttribute(ModelConstants.SHIPPING_ADDRESSES_VIEW_BEAN)
+    public List<CustomerAddressViewBean> getshippingAddresses(HttpServletRequest request) {
+        List<CustomerAddressViewBean> addressesValues = new ArrayList<CustomerAddressViewBean>();
+        try {
+            final RequestData requestData = requestUtil.getRequestData(request);
+            final Customer customer = requestData.getCustomer();
+            Set<CustomerAddress> addresses = customer.getAddresses();
+            for (Iterator<CustomerAddress> iterator = addresses.iterator(); iterator.hasNext();) {
+                final CustomerAddress customerAddress = (CustomerAddress) iterator.next();
+                addressesValues.add(frontofficeViewBeanFactory.buildCustomeAddressViewBean(requestData, customerAddress));
+            }
+
+            Collections.sort(addressesValues, new Comparator<CustomerAddressViewBean>() {
+                @Override
+                public int compare(CustomerAddressViewBean o1, CustomerAddressViewBean o2) {
+                    return o1.getAddressName().compareTo(o2.getAddressName());
+                }
+            });
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+        return addressesValues;
+    }
+
 }

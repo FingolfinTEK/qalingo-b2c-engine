@@ -17,7 +17,7 @@ public interface OrderCustomerDao {
 
 	OrderCustomer getOrderById(Long orderCustomerId);
 
-	OrderCustomer getOrderByCode(String code);
+	OrderCustomer getOrderByOrderNum(String orderNum);
 	
 	List<OrderCustomer> findOrders();
 	
@@ -25,7 +25,7 @@ public interface OrderCustomerDao {
 	
 	OrderCustomer createNewOrder(OrderCustomer orderCustomer);
 	
-	void updateOrder(OrderCustomer orderCustomer);
+	OrderCustomer saveOrUpdateOrder(OrderCustomer orderCustomer);
 
 	void deleteOrder(OrderCustomer orderCustomer);
 

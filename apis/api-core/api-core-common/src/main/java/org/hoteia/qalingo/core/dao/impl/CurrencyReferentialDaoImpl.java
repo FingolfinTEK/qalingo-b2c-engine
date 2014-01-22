@@ -29,21 +29,21 @@ public class CurrencyReferentialDaoImpl extends AbstractGenericDaoImpl implement
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public CurrencyReferential getCurrencyReferentialById(final Long currencyReferentialId) {
-        Criteria criteria = getSession().createCriteria(CurrencyReferential.class);
+        Criteria criteria = createDefaultCriteria(CurrencyReferential.class);
         criteria.add(Restrictions.eq("id", currencyReferentialId));
         CurrencyReferential currencyReferential = (CurrencyReferential) criteria.uniqueResult();
         return currencyReferential;
 	}
 
 	public CurrencyReferential getCurrencyReferentialByCode(final String currencyReferentialCode) {
-        Criteria criteria = getSession().createCriteria(CurrencyReferential.class);
+        Criteria criteria = createDefaultCriteria(CurrencyReferential.class);
         criteria.add(Restrictions.eq("code", currencyReferentialCode));
         CurrencyReferential currencyReferential = (CurrencyReferential) criteria.uniqueResult();
         return currencyReferential;
 	}
 	
 	public List<CurrencyReferential> findCurrencyReferentials() {
-        Criteria criteria = getSession().createCriteria(CurrencyReferential.class);
+        Criteria criteria = createDefaultCriteria(CurrencyReferential.class);
         
         criteria.addOrder(Order.asc("code"));
 
@@ -52,19 +52,25 @@ public class CurrencyReferentialDaoImpl extends AbstractGenericDaoImpl implement
         return users;
 	}
 
-	public void saveOrUpdateCurrencyReferential(CurrencyReferential currencyReferential) {
+	public CurrencyReferential saveOrUpdateCurrencyReferential(final CurrencyReferential currencyReferential) {
 		if(currencyReferential.getDateCreate() == null){
 			currencyReferential.setDateCreate(new Date());
 		}
 		currencyReferential.setDateUpdate(new Date());
-		if(currencyReferential.getId() == null){
-			em.persist(currencyReferential);
-		} else {
-			em.merge(currencyReferential);
-		}
+        if (currencyReferential.getId() != null) {
+            if(em.contains(currencyReferential)){
+                em.refresh(currencyReferential);
+            }
+            CurrencyReferential mergedCurrencyReferential = em.merge(currencyReferential);
+            em.flush();
+            return mergedCurrencyReferential;
+        } else {
+            em.persist(currencyReferential);
+            return currencyReferential;
+        }
 	}
 
-	public void deleteCurrencyReferential(CurrencyReferential currencyReferential) {
+	public void deleteCurrencyReferential(final CurrencyReferential currencyReferential) {
 		em.remove(currencyReferential);
 	}
 

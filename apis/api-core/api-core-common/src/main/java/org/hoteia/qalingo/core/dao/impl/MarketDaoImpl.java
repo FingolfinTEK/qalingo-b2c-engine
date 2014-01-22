@@ -35,7 +35,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	// MARKET PLACE
 	
     public MarketPlace getDefaultMarketPlace() {
-        Criteria criteria = getSession().createCriteria(MarketPlace.class);
+        Criteria criteria = createDefaultCriteria(MarketPlace.class);
         
         addDefaultMarketPlaceFetch(criteria);
         criteria.add(Restrictions.eq("isDefault", true));
@@ -44,7 +44,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
     }
     
     public MarketPlace getMarketPlaceById(final Long marketPlaceId) {
-        Criteria criteria = getSession().createCriteria(MarketPlace.class);
+        Criteria criteria = createDefaultCriteria(MarketPlace.class);
         
         addDefaultMarketPlaceFetch(criteria);
 
@@ -54,7 +54,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
     }
     
     public MarketPlace getMarketPlaceByCode(final String code) {
-        Criteria criteria = getSession().createCriteria(MarketPlace.class);
+        Criteria criteria = createDefaultCriteria(MarketPlace.class);
         
         addDefaultMarketPlaceFetch(criteria);
 
@@ -64,7 +64,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
     }
     
     public List<MarketPlace> findMarketPlaces() {
-        Criteria criteria = getSession().createCriteria(MarketPlace.class);
+        Criteria criteria = createDefaultCriteria(MarketPlace.class);
 
         addDefaultMarketPlaceFetch(criteria);
         
@@ -76,26 +76,32 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
         return marketPlaces;
     }
 
-    public void saveOrUpdateMarketPlace(MarketPlace marketPlace) {
+    public MarketPlace saveOrUpdateMarketPlace(final MarketPlace marketPlace) {
         if(marketPlace.getDateCreate() == null){
             marketPlace.setDateCreate(new Date());
         }
         marketPlace.setDateUpdate(new Date());
-        if(marketPlace.getId() == null){
-            em.persist(marketPlace);
+        if (marketPlace.getId() != null) {
+            if(em.contains(marketPlace)){
+                em.refresh(marketPlace);
+            }
+            MarketPlace mergedMarketPlace = em.merge(marketPlace);
+            em.flush();
+            return mergedMarketPlace;
         } else {
-            em.merge(marketPlace);
+            em.persist(marketPlace);
+            return marketPlace;
         }
     }
 
-    public void deleteMarketPlace(MarketPlace marketPlace) {
+    public void deleteMarketPlace(final MarketPlace marketPlace) {
         em.remove(marketPlace);
     }
     
 	// MARKET
 	
 	public Market getDefaultMarket() {
-        Criteria criteria = getSession().createCriteria(Market.class);
+        Criteria criteria = createDefaultCriteria(Market.class);
         
         addDefaultMarketFetch(criteria);
         
@@ -105,7 +111,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	}
 	
 	public Market getMarketById(final Long marketId) {
-        Criteria criteria = getSession().createCriteria(Market.class);
+        Criteria criteria = createDefaultCriteria(Market.class);
 
         addDefaultMarketFetch(criteria);
 
@@ -115,7 +121,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	}
 
 	public Market getMarketByCode(final String code) {
-        Criteria criteria = getSession().createCriteria(Market.class);
+        Criteria criteria = createDefaultCriteria(Market.class);
 
         addDefaultMarketFetch(criteria);
 
@@ -125,7 +131,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	}
 	
 	public List<Market> findMarkets() {
-        Criteria criteria = getSession().createCriteria(Market.class);
+        Criteria criteria = createDefaultCriteria(Market.class);
         
         addDefaultMarketFetch(criteria);
 
@@ -137,7 +143,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	}
 	
     public List<Market> getMarketsByMarketPlaceCode(final String marketPlaceCode) {
-        Criteria criteria = getSession().createCriteria(Market.class);
+        Criteria criteria = createDefaultCriteria(Market.class);
 
         addDefaultMarketFetch(criteria);
 
@@ -151,26 +157,32 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
         return markets;
     }
 
-	public void saveOrUpdateMarket(Market market) {
+	public Market saveOrUpdateMarket(final Market market) {
 		if(market.getDateCreate() == null){
 			market.setDateCreate(new Date());
 		}
 		market.setDateUpdate(new Date());
-		if(market.getId() == null){
-			em.persist(market);
-		} else {
-			em.merge(market);
-		}
+        if (market.getId() != null) {
+            if(em.contains(market)){
+                em.refresh(market);
+            }
+            Market mergedMarket = em.merge(market);
+            em.flush();
+            return mergedMarket;
+        } else {
+            em.persist(market);
+            return market;
+        }
 	}
 
-	public void deleteMarket(Market market) {
+	public void deleteMarket(final Market market) {
 		em.remove(market);
 	}
 	
 	// MARKET AREA
 
 	public MarketArea getMarketAreaById(final Long marketAreaId) {
-        Criteria criteria = getSession().createCriteria(MarketArea.class);
+        Criteria criteria = createDefaultCriteria(MarketArea.class);
         
         addDefaultMarketAreaFetch(criteria);
 
@@ -180,7 +192,7 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 	}
 	
 	public MarketArea getMarketAreaByCode(final String code) {
-        Criteria criteria = getSession().createCriteria(MarketArea.class);
+        Criteria criteria = createDefaultCriteria(MarketArea.class);
         
         addDefaultMarketAreaFetch(criteria);
         
@@ -189,13 +201,35 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 		return marketArea;
 	}
 	
+    public MarketArea saveOrUpdateMarketArea(final MarketArea marketArea) {
+        if(marketArea.getDateCreate() == null){
+            marketArea.setDateCreate(new Date());
+        }
+        marketArea.setDateUpdate(new Date());
+        if (marketArea.getId() != null) {
+            if(em.contains(marketArea)){
+                em.refresh(marketArea);
+            }
+            MarketArea mergedMarketArea = em.merge(marketArea);
+            em.flush();
+            return mergedMarketArea;
+        } else {
+            em.persist(marketArea);
+            return marketArea;
+        }
+    }
+
+    public void deleteMarketArea(final MarketArea marketArea) {
+        em.remove(marketArea);
+    }
+	
     private void addDefaultMarketPlaceFetch(Criteria criteria) {
 //      ProjectionList projections = Projections.projectionList();
 //      criteria.setProjection(projections);
 
-      criteria.setFetchMode("masterCatalog", FetchMode.JOIN);
-      criteria.setFetchMode("markets", FetchMode.JOIN);
-      criteria.setFetchMode("marketPlaceAttributes", FetchMode.JOIN);
+        criteria.setFetchMode("masterCatalog", FetchMode.JOIN);
+        criteria.setFetchMode("markets", FetchMode.JOIN);
+        criteria.setFetchMode("marketPlaceAttributes", FetchMode.JOIN);
       
 //      criteria.createAlias("markets.marketAreas", "marketAreas", JoinType.LEFT_OUTER_JOIN);
 //      criteria.setFetchMode("markets.marketAreas", FetchMode.JOIN);
@@ -219,9 +253,6 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
 //      criteria.setFetchMode("marketAreaAttributes", FetchMode.JOIN);
 //      
 //      projections.add(Projections.property("markets.marketAreas.marketAreaAttributes"));
-      
-      criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-      
   }
     
     private void addDefaultMarketFetch(Criteria criteria) {
@@ -240,22 +271,37 @@ public class MarketDaoImpl extends AbstractGenericDaoImpl implements MarketDao {
         
         criteria.createAlias("marketAreas.marketAreaAttributes", "marketAreaAttributes", JoinType.LEFT_OUTER_JOIN);
         criteria.setFetchMode("marketAreaAttributes", FetchMode.JOIN);
-        
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     }
     
     private void addDefaultMarketAreaFetch(Criteria criteria) {
         
-        criteria.setFetchMode("virtualCatalog", FetchMode.JOIN);
+        criteria.setFetchMode("catalog", FetchMode.JOIN);
+        
+        criteria.createAlias("catalog.catalogMaster", "catalogMaster", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("catalogMaster", FetchMode.JOIN);
+
         criteria.setFetchMode("market", FetchMode.JOIN);
         
-        criteria.setFetchMode("currency", FetchMode.JOIN);
+        criteria.setFetchMode("defaultCurrency", FetchMode.JOIN);
+        criteria.setFetchMode("currencies", FetchMode.JOIN);
+
+        criteria.setFetchMode("marketAreaAttributes", FetchMode.JOIN);
+
         criteria.setFetchMode("defaultLocalization", FetchMode.JOIN);
         criteria.setFetchMode("localizations", FetchMode.JOIN);
+
+        criteria.setFetchMode("defaultRetailer", FetchMode.JOIN);
         criteria.setFetchMode("retailers", FetchMode.JOIN);
-        criteria.setFetchMode("marketAreaAttributes", FetchMode.JOIN);
+
+        criteria.setFetchMode("deliveryMethods", FetchMode.JOIN);
         
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        criteria.createAlias("deliveryMethods.countries", "deliveryMethodCountries", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("deliveryMethodCountries", FetchMode.JOIN);
+
+        criteria.createAlias("deliveryMethods.prices", "deliveryMethodPrices", JoinType.LEFT_OUTER_JOIN);
+        criteria.setFetchMode("deliveryMethodPrices", FetchMode.JOIN);
+
+        criteria.setFetchMode("paymentGateways", FetchMode.JOIN);
     }
 	
 }

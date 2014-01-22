@@ -38,7 +38,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	// RETAILER
 
 	public Retailer getRetailerById(final Long retailerId) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
         
@@ -48,7 +48,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 
     public Retailer getRetailerByCode(final String retailerCode) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
 
         addDefaultRetailerFetch(criteria);
 
@@ -58,7 +58,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
     }
 
 	public Retailer getRetailerByCode(final Long marketAreaId, final Long retailerId, final String retailerCode) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
 
         addDefaultRetailerFetch(criteria);
 
@@ -68,7 +68,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
     public List<Retailer> findAllRetailers() {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -80,7 +80,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
     }
     
     public List<Retailer> findRetailersByMarketAreaCode(final String marketAreaCode) {
-        Criteria criteria = getSession().createCriteria(MarketArea.class);
+        Criteria criteria = createDefaultCriteria(MarketArea.class);
 
         criteria.add(Restrictions.eq("code", marketAreaCode));
         MarketArea marketArea = (MarketArea) criteria.uniqueResult();
@@ -90,7 +90,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
   }
 
     public List<Retailer> findRetailers(final Long marketAreaId, final Long retailerId) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -102,7 +102,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
 	public List<Retailer> findRetailersByTags(final Long marketAreaId, final Long retailerId, final List<String> tags) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
 
         addDefaultRetailerFetch(criteria);
 
@@ -117,7 +117,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 
 	public List<Retailer> findLastRetailers(final Long marketAreaId, final Long retailerId, int maxResults) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -129,7 +129,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
 	public List<Retailer> findBestRetailersByQualityOfService(final Long marketAreaId, final Long retailerId, int maxResults) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -141,7 +141,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
 	public List<Retailer> findBestRetailersByQualityPrice(final Long marketAreaId, final Long retailerId, int maxResults) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -153,7 +153,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
 	public List<Retailer> findRetailersByText(final Long marketAreaId, final Long retailerId, final String searchTxt) {
-        Criteria criteria = getSession().createCriteria(Retailer.class);
+        Criteria criteria = createDefaultCriteria(Retailer.class);
         
         addDefaultRetailerFetch(criteria);
 
@@ -168,44 +168,68 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 		return retailers;
 	}
 	
-	public void saveOrUpdateRetailer(final Retailer retailer) {
+	public Retailer saveOrUpdateRetailer(final Retailer retailer) {
 		if(retailer.getDateCreate() == null){
 			retailer.setDateCreate(new Date());
 		}
 		retailer.setDateUpdate(new Date());
-		if(retailer.getId() == null){
-			em.persist(retailer);
-		} else {
-			em.merge(retailer);
-		}
+        if (retailer.getId() != null) {
+            if(em.contains(retailer)){
+                em.refresh(retailer);
+            }
+            Retailer mergedRetailer = em.merge(retailer);
+            em.flush();
+            return mergedRetailer;
+        } else {
+            em.persist(retailer);
+            return retailer;
+        }
 	}
 
 	public void deleteRetailer(final Retailer retailer) {
 		em.remove(retailer);
 	}
 	
-	public void saveOrUpdateRetailerCustomerRate(final RetailerCustomerRate retailerCustomerRate) {
-		if(retailerCustomerRate.getId() == null){
-			em.persist(retailerCustomerRate);
-		} else {
-			em.merge(retailerCustomerRate);
-		}
-	}
+    // RETAILER COMMENT/RATE
+	
+    public RetailerCustomerRate saveOrUpdateRetailerCustomerRate(final RetailerCustomerRate retailerCustomerRate) {
+        if (retailerCustomerRate.getDateCreate() == null) {
+            retailerCustomerRate.setDateCreate(new Date());
+        }
+        retailerCustomerRate.setDateUpdate(new Date());
+        if (retailerCustomerRate.getId() != null) {
+            if(em.contains(retailerCustomerRate)){
+                em.refresh(retailerCustomerRate);
+            }
+            RetailerCustomerRate mergedRetailerCustomerRate = em.merge(retailerCustomerRate);
+            em.flush();
+            return mergedRetailerCustomerRate;
+        } else {
+            em.persist(retailerCustomerRate);
+            return retailerCustomerRate;
+        }
+    }
 
 	public void deleteRetailerCustomerRate(final RetailerCustomerRate retailerCustomerRate) {
 		em.remove(retailerCustomerRate);
 	}
 	
-	public void saveOrUpdateRetailerCustomerComment(final RetailerCustomerComment retailerCustomerComment) {
+	public RetailerCustomerComment saveOrUpdateRetailerCustomerComment(final RetailerCustomerComment retailerCustomerComment) {
 		if(retailerCustomerComment.getDateCreate() == null){
 			retailerCustomerComment.setDateCreate(new Date());
 		}
 		retailerCustomerComment.setDateUpdate(new Date());
-		if(retailerCustomerComment.getId() == null){
-			em.persist(retailerCustomerComment);
-		} else {
-			em.merge(retailerCustomerComment);
-		}
+        if (retailerCustomerComment.getId() != null) {
+            if(em.contains(retailerCustomerComment)){
+                em.refresh(retailerCustomerComment);
+            }
+            RetailerCustomerComment mergedRetailerCustomerComment = em.merge(retailerCustomerComment);
+            em.flush();
+            return mergedRetailerCustomerComment;
+        } else {
+            em.persist(retailerCustomerComment);
+            return retailerCustomerComment;
+        }
 	}
 
 	public void deleteRetailerCustomerComment(final RetailerCustomerComment retailerCustomerComment) {
@@ -215,7 +239,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	// STORE
 	
 	public Store getStoreById(final Long storeId) {
-        Criteria criteria = getSession().createCriteria(Store.class);
+        Criteria criteria = createDefaultCriteria(Store.class);
         
         criteria.addOrder(Order.asc("code"));
         
@@ -225,7 +249,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 
 	public Store getStoreByCode(final String storeCode) {
-        Criteria criteria = getSession().createCriteria(Store.class);
+        Criteria criteria = createDefaultCriteria(Store.class);
         
         criteria.addOrder(Order.asc("code"));
         
@@ -235,7 +259,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 	}
 	
 	public List<Store> findStores() {
-        Criteria criteria = getSession().createCriteria(Store.class);
+        Criteria criteria = createDefaultCriteria(Store.class);
         
         addDefaultStoreFetch(criteria);
         
@@ -246,16 +270,22 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
 		return stores;
 	}
 
-	public void saveOrUpdateStore(final Store store) {
+	public Store saveOrUpdateStore(final Store store) {
 		if(store.getDateCreate() == null){
 			store.setDateCreate(new Date());
 		}
 		store.setDateUpdate(new Date());
-		if(store.getId() == null){
-			em.persist(store);
-		} else {
-			em.merge(store);
-		}
+        if (store.getId() != null) {
+            if(em.contains(store)){
+                em.refresh(store);
+            }
+            Store mergedStore = em.merge(store);
+            em.flush();
+            return mergedStore;
+        } else {
+            em.persist(store);
+            return store;
+        }
 	}
 
 	public void deleteStore(final Store store) {
@@ -275,6 +305,7 @@ public class RetailerDaoImpl extends AbstractGenericDaoImpl implements RetailerD
     
     private void addDefaultStoreFetch(Criteria criteria) {
         criteria.setFetchMode("storeAttributes", FetchMode.JOIN); 
+        criteria.setFetchMode("assets", FetchMode.JOIN); 
     }
 
 }

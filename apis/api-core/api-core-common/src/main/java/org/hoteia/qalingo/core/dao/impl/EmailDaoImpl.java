@@ -24,9 +24,8 @@ import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.hoteia.qalingo.core.dao.EmailDao;
 import org.hoteia.qalingo.core.domain.Email;
 import org.hoteia.qalingo.core.util.impl.MimeMessagePreparatorImpl;
@@ -42,53 +41,59 @@ public class EmailDaoImpl extends AbstractGenericDaoImpl implements EmailDao {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public Email getEmailById(final Long emailId) {
-        Criteria criteria = getSession().createCriteria(Email.class);
+        Criteria criteria = createDefaultCriteria(Email.class);
         criteria.add(Restrictions.eq("id", emailId));
         Email email = (Email) criteria.uniqueResult();
         return email;
     }
 
     public List<Email> findEmailByStatus(final String status) {
-        Criteria criteria = getSession().createCriteria(Email.class);
+        Criteria criteria = createDefaultCriteria(Email.class);
         criteria.add(Restrictions.eq("status", status));
         
         criteria.addOrder(Order.asc("id"));
 
         @SuppressWarnings("unchecked")
         List<Email> emails = criteria.list();
-        
         return emails;
     }
 
     public List<Long> findIdsForEmailSync() {
-        Criteria criteria = getSession().createCriteria(Email.class);
+        Criteria criteria = createDefaultCriteria(Email.class);
         criteria.add(Restrictions.or(Restrictions.eq("status", Email.EMAIl_STATUS_PENDING), Restrictions.eq("status", Email.EMAIl_STATUS_ERROR)));
         criteria.add(Restrictions.le("processedCount", 5));
         
-        criteria.setProjection(Property.forName("id"));
-        criteria.setResultTransformer(Transformers.aliasToBean(Long.class));
-        
+        criteria.setProjection(Projections.property("id"));//Property.forName()
+
         @SuppressWarnings("unchecked")
         List<Long> emailIds = criteria.list();
+//        List<Long> emailIds = new ArrayList<Long>(emails.size());
+//        for (Iterator<Email> iterator = emails.iterator(); iterator.hasNext();) {
+//            Email email = (Email) iterator.next();
+//            emailIds.add(email.getId());
+//        }
         return emailIds;
     }
 
     public List<Long> findIdsForEmailSync(final String type) {
-        Criteria criteria = getSession().createCriteria(Email.class);
+        Criteria criteria = createDefaultCriteria(Email.class);
         criteria.add(Restrictions.eq("type", type));
         criteria.add(Restrictions.or(Restrictions.eq("status", Email.EMAIl_STATUS_PENDING), Restrictions.eq("status", Email.EMAIl_STATUS_ERROR)));
         criteria.add(Restrictions.le("processedCount", 5));
         
-        criteria.setProjection(Property.forName("id"));
-        criteria.setResultTransformer(Transformers.aliasToBean(Long.class));
+        criteria.setProjection(Projections.property("id"));//Property.forName()
         
         @SuppressWarnings("unchecked")
         List<Long> emailIds = criteria.list();
-        
+//        List<Long> emailIds = new ArrayList<Long>(emails.size());
+//        for (Iterator<Email> iterator = emails.iterator(); iterator.hasNext();) {
+//            Email email = (Email) iterator.next();
+//            emailIds.add(email.getId());
+//        }
         return emailIds;
     }
 
-    public void saveOrUpdateEmail(final Email email) {
+    public Email saveOrUpdateEmail(final Email email) {
         if (email.getDateCreate() == null) {
             email.setDateCreate(new Timestamp(new Date().getTime()));
         }
@@ -96,11 +101,16 @@ public class EmailDaoImpl extends AbstractGenericDaoImpl implements EmailDao {
             email.setStatus(Email.EMAIl_STATUS_PENDING);
         }
         email.setDateUpdate(new Timestamp(new Date().getTime()));
-
-        if (email.getId() == null) {
-            em.persist(email);
+        if (email.getId() != null) {
+            if(em.contains(email)){
+                em.refresh(email);
+            }
+            Email mergedEmail = em.merge(email);
+            em.flush();
+            return mergedEmail;
         } else {
-            em.merge(email);
+            em.persist(email);
+            return email;
         }
     }
 
@@ -166,7 +176,7 @@ public class EmailDaoImpl extends AbstractGenericDaoImpl implements EmailDao {
         em.remove(email);
     }
 
-    public int deleteSendedEmail(Timestamp before) {
+    public int deleteSendedEmail(final Timestamp before) {
         Session session = (Session) em.getDelegate();
         String sql = "FROM Email WHERE dateCreate <= :before AND status = '" + Email.EMAIl_STATUS_SENDED + "'";
         Query query = session.createQuery(sql);

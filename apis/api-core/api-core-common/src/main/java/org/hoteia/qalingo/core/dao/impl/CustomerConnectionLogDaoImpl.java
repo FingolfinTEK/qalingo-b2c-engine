@@ -28,14 +28,14 @@ public class CustomerConnectionLogDaoImpl extends AbstractGenericDaoImpl impleme
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public CustomerConnectionLog getCustomerConnectionLogById(final Long customerConnectionLogId) {
-        Criteria criteria = getSession().createCriteria(CustomerConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(CustomerConnectionLog.class);
         criteria.add(Restrictions.eq("id", customerConnectionLogId));
         CustomerConnectionLog customerConnectionLog = (CustomerConnectionLog) criteria.uniqueResult();
         return customerConnectionLog;
 	}
 
 	public List<CustomerConnectionLog> findCustomerConnectionLogsByCustomerId(Long customerId){
-        Criteria criteria = getSession().createCriteria(CustomerConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(CustomerConnectionLog.class);
         criteria.add(Restrictions.eq("customerId", customerId));
         
         criteria.addOrder(Order.asc("loginDate"));
@@ -46,7 +46,7 @@ public class CustomerConnectionLogDaoImpl extends AbstractGenericDaoImpl impleme
 	}
 	
 	public List<CustomerConnectionLog> findCustomerConnectionLogsByCustomerIdAndAppCode(final Long customerId, final String appCode) {
-        Criteria criteria = getSession().createCriteria(CustomerConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(CustomerConnectionLog.class);
         criteria.add(Restrictions.eq("customerId", customerId));
         criteria.add(Restrictions.eq("appCode", appCode));
         
@@ -57,12 +57,18 @@ public class CustomerConnectionLogDaoImpl extends AbstractGenericDaoImpl impleme
         return customerConnectionLogs;
 	}
 	
-	public void saveOrUpdateCustomerConnectionLog(CustomerConnectionLog customerConnectionLog) {
-		if(customerConnectionLog.getId() == null){
-			em.persist(customerConnectionLog);
-		} else {
-			em.merge(customerConnectionLog);
-		}
+	public CustomerConnectionLog saveOrUpdateCustomerConnectionLog(CustomerConnectionLog customerConnectionLog) {
+        if (customerConnectionLog.getId() != null) {
+            if(em.contains(customerConnectionLog)){
+                em.refresh(customerConnectionLog);
+            }
+            CustomerConnectionLog mergedCustomerConnectionLog = em.merge(customerConnectionLog);
+            em.flush();
+            return mergedCustomerConnectionLog;
+        } else {
+            em.persist(customerConnectionLog);
+            return customerConnectionLog;
+        }
 	}
 
 	public void deleteCustomerConnectionLog(CustomerConnectionLog customerConnectionLog) {

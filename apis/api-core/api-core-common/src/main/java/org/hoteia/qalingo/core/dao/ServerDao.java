@@ -10,6 +10,7 @@
 package org.hoteia.qalingo.core.dao;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.hoteia.qalingo.core.domain.ServerStatus;
@@ -24,10 +25,11 @@ public interface ServerDao {
     
     List<ServerStatus> getServerList();
     
-    void saveOrUpdateServerStatus(ServerStatus serverStatus, String message) throws IOException;
+    ServerStatus saveOrUpdateServerStatus(ServerStatus serverStatus, String message) throws IOException;
     
-	void saveOrUpdateServerStatus(ServerStatus serverStatus);
+    ServerStatus saveOrUpdateServerStatus(ServerStatus serverStatus);
 
 	void deleteServerStatus(ServerStatus serverStatus);
 
+	int deleteSendedServerStatus(Timestamp before);
 }

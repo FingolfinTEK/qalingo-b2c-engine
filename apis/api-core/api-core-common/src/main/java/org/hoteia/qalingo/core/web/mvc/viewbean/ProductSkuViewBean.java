@@ -41,6 +41,12 @@ public class ProductSkuViewBean extends AbstractViewBean implements Serializable
     protected ProductMarketingViewBean productMarketing;
     protected List<AssetViewBean> assets = new ArrayList<AssetViewBean>();
     
+    protected String catalogPrice;
+    protected String salePrice;
+    protected String currencySign;
+    protected String currencyAbbreviated;
+    protected String priceWithCurrencySign;
+    
     protected String addToCartUrl;
     protected String removeFromCartUrl;
     protected String addToWishlistUrl;
@@ -164,6 +170,46 @@ public class ProductSkuViewBean extends AbstractViewBean implements Serializable
         this.assets = assets;
     }
     
+    public String getCatalogPrice() {
+        return catalogPrice;
+    }
+
+    public void setCatalogPrice(String catalogPrice) {
+        this.catalogPrice = catalogPrice;
+    }
+
+    public String getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(String salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public String getCurrencySign() {
+        return currencySign;
+    }
+
+    public void setCurrencySign(String currencySign) {
+        this.currencySign = currencySign;
+    }
+
+    public String getCurrencyAbbreviated() {
+        return currencyAbbreviated;
+    }
+
+    public void setCurrencyAbbreviated(String currencyAbbreviated) {
+        this.currencyAbbreviated = currencyAbbreviated;
+    }
+
+    public String getPriceWithCurrencySign() {
+        return priceWithCurrencySign;
+    }
+
+    public void setPriceWithCurrencySign(String priceWithCurrencySign) {
+        this.priceWithCurrencySign = priceWithCurrencySign;
+    }
+    
     public String getAddToCartUrl() {
         return addToCartUrl;
     }
@@ -223,7 +269,7 @@ public class ProductSkuViewBean extends AbstractViewBean implements Serializable
     public String getUpdatedDate() {
         return updatedDate;
     }
-
+    
     public void setUpdatedDate(String updatedDate) {
         this.updatedDate = updatedDate;
     }

@@ -26,7 +26,7 @@ public class TaxDaoImpl extends AbstractGenericDaoImpl implements TaxDao {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public Tax getTaxById(final Long taxId) {
-        Criteria criteria = getSession().createCriteria(Tax.class);
+        Criteria criteria = createDefaultCriteria(Tax.class);
         
         addDefaultFetch(criteria);
         
@@ -35,15 +35,21 @@ public class TaxDaoImpl extends AbstractGenericDaoImpl implements TaxDao {
         return tax;
 	}
 
-	public void saveOrUpdateTax(Tax tax) {
-		if(tax.getId() == null){
-			em.persist(tax);
-		} else {
-			em.merge(tax);
-		}
+	public Tax saveOrUpdateTax(final Tax tax) {
+        if (tax.getId() != null) {
+            if(em.contains(tax)){
+                em.refresh(tax);
+            }
+            Tax mergedTax = em.merge(tax);
+            em.flush();
+            return mergedTax;
+        } else {
+            em.persist(tax);
+            return tax;
+        }
 	}
 
-	public void deleteTax(Tax tax) {
+	public void deleteTax(final Tax tax) {
 		em.remove(tax);
 	}
 

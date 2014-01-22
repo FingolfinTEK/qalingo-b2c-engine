@@ -13,11 +13,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.sql.Blob;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -36,14 +39,14 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public ServerStatus getServerStatusById(final Long serverStatusId) {
-        Criteria criteria = getSession().createCriteria(ServerStatus.class);
+        Criteria criteria = createDefaultCriteria(ServerStatus.class);
         criteria.add(Restrictions.eq("id", serverStatusId));
         ServerStatus serverStatus = (ServerStatus) criteria.uniqueResult();
         return serverStatus;
 	}
 	
     public List<ServerStatus> findServerStatus(final String serverName) {
-        Criteria criteria = getSession().createCriteria(ServerStatus.class);
+        Criteria criteria = createDefaultCriteria(ServerStatus.class);
         criteria.add(Restrictions.eq("serverName", serverName));
         
         criteria.addOrder(Order.asc("lastCheckReceived"));
@@ -54,7 +57,7 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
     }
     
     public List<ServerStatus> findServerStatus() {
-        Criteria criteria = getSession().createCriteria(ServerStatus.class);
+        Criteria criteria = createDefaultCriteria(ServerStatus.class);
         
         criteria.addOrder(Order.asc("serverName"));
         criteria.addOrder(Order.asc("lastCheckReceived"));
@@ -65,7 +68,7 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
     }
 
     public List<ServerStatus> getServerList(){
-        Criteria criteria = getSession().createCriteria(ServerStatus.class);
+        Criteria criteria = createDefaultCriteria(ServerStatus.class);
         criteria.setProjection(Projections.groupProperty("serverName").as("serverName"));
 
         List<String> serverNames = (List<String>) criteria.list();
@@ -79,7 +82,6 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
                 
             }
         }
-        
         return serverStatus;
     }
 
@@ -87,7 +89,7 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
      * @throws IOException
      * @see org.hoteia.qalingo.core.dao.impl.ServerDaoImpl#saveOrUpdateServerStatus(ServerStatus serverStatus, String message)
      */
-    public void saveOrUpdateServerStatus(final ServerStatus serverStatus, final String message) throws IOException {
+    public ServerStatus saveOrUpdateServerStatus(final ServerStatus serverStatus, final String message) throws IOException {
         Session session = (Session) em.getDelegate();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -105,18 +107,42 @@ public class ServerDaoImpl extends AbstractGenericDaoImpl implements ServerDao {
         serverStatus.setMessageContent(blob);
 
         saveOrUpdateServerStatus(serverStatus);
+        
+        return serverStatus;
     }
     
-	public void saveOrUpdateServerStatus(ServerStatus serverStatus) {
-		if(serverStatus.getId() == null){
-			em.persist(serverStatus);
-		} else {
-			em.merge(serverStatus);
-		}
+	public ServerStatus saveOrUpdateServerStatus(final ServerStatus serverStatus) {
+        if (serverStatus.getId() != null) {
+            if(em.contains(serverStatus)){
+                em.refresh(serverStatus);
+            }
+            ServerStatus mergedServerStatus = em.merge(serverStatus);
+            em.flush();
+            return mergedServerStatus;
+        } else {
+            em.persist(serverStatus);
+            return serverStatus;
+        }
 	}
 
-	public void deleteServerStatus(ServerStatus serverStatus) {
+	public void deleteServerStatus(final ServerStatus serverStatus) {
 		em.remove(serverStatus);
 	}
+	
+    public int deleteSendedServerStatus(final Timestamp before) {
+        Session session = (Session) em.getDelegate();
+        String sql = "FROM ServerStatus WHERE lastCheckReceived <= :before";
+        Query query = session.createQuery(sql);
+        query.setTimestamp("before", before);
+        List<ServerStatus> serverStatusList = (List<ServerStatus>) query.list();
+        if (serverStatusList != null) {
+            for (Iterator<ServerStatus> iterator = serverStatusList.iterator(); iterator.hasNext();) {
+                ServerStatus serverStatus = (ServerStatus) iterator.next();
+                deleteServerStatus(serverStatus);
+            }
+            return serverStatusList.size();
+        }
+        return 0;
+    }
 
 }

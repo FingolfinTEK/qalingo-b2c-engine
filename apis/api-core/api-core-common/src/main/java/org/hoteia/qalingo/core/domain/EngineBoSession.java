@@ -45,6 +45,9 @@ public class EngineBoSession extends AbstractEngineSession {
 	@Column(name="JSESSION_ID")
 	private String jSessionId;
 	
+    @Column(name = "ENGINE_SESSION_GUID")
+    private String engineSessionGuid;
+    
     @Transient
     private boolean environmentStagingModeEnabled;
     
@@ -66,6 +69,9 @@ public class EngineBoSession extends AbstractEngineSession {
 	@Transient 
 	private Retailer currentMarketAreaRetailer;
 
+    @Transient
+    private CurrencyReferential currentMarketAreaCurrency;
+    
 	@Transient 
 	private Localization currentBackofficeLocalization;
 
@@ -115,6 +121,14 @@ public class EngineBoSession extends AbstractEngineSession {
 	public void setjSessionId(String jSessionId) {
 		this.jSessionId = jSessionId;
 	}
+	
+	public String getEngineSessionGuid() {
+        return engineSessionGuid;
+    }
+	
+	public void setEngineSessionGuid(String engineSessionGuid) {
+        this.engineSessionGuid = engineSessionGuid;
+    }
 	
     public boolean isEnvironmentStagingModeEnabled() {
         return environmentStagingModeEnabled;
@@ -172,7 +186,15 @@ public class EngineBoSession extends AbstractEngineSession {
 		this.currentMarketAreaRetailer = retailer;
 	}
 	
-	public Localization getCurrentBackofficeLocalization() {
+	public CurrencyReferential getCurrentMarketAreaCurrency() {
+        return currentMarketAreaCurrency;
+    }
+
+    public void setCurrentMarketAreaCurrency(CurrencyReferential currentMarketAreaCurrency) {
+        this.currentMarketAreaCurrency = currentMarketAreaCurrency;
+    }
+
+    public Localization getCurrentBackofficeLocalization() {
 		return currentBackofficeLocalization;
 	}
 	
@@ -227,5 +249,43 @@ public class EngineBoSession extends AbstractEngineSession {
 	public void setDateUpdate(Date dateUpdate) {
 		this.dateUpdate = dateUpdate;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((jSessionId == null) ? 0 : jSessionId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EngineBoSession other = (EngineBoSession) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (jSessionId == null) {
+            if (other.jSessionId != null)
+                return false;
+        } else if (!jSessionId.equals(other.jSessionId))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "EngineBoSession [id=" + id + ", version=" + version + ", jSessionId=" + jSessionId + ", engineSessionGuid=" + engineSessionGuid + ", environmentStagingModeEnabled="
+                + environmentStagingModeEnabled + ", environmentType=" + environmentType + ", theme=" + theme + ", device=" + device + ", dateCreate=" + dateCreate + ", dateUpdate=" + dateUpdate
+                + "]";
+    }
 	
 }

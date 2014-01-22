@@ -41,7 +41,7 @@ import org.hoteia.qalingo.core.Constants;
 import org.hoteia.qalingo.core.domain.enumtype.AssetType;
 
 @Entity
-@Table(name="TECO_PRODUCT_SKU", uniqueConstraints = {@UniqueConstraint(columnNames= {"code"})})
+@Table(name="TECO_PRODUCT_SKU", uniqueConstraints = {@UniqueConstraint(columnNames= {"CODE"})})
 public class ProductSku extends AbstractEntity {
 
 	/**
@@ -74,8 +74,8 @@ public class ProductSku extends AbstractEntity {
     @JoinColumn(name="PRODUCT_SKU_ID")
 	private Set<ProductSkuAttribute> productSkuAttributes = new HashSet<ProductSkuAttribute>(); 
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="PRODUCT_MARKETING_ID", insertable=false, updatable=false)
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="PRODUCT_MARKETING_ID", insertable = true, updatable = true)
 	private ProductMarketing productMarketing;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -91,16 +91,8 @@ public class ProductSku extends AbstractEntity {
     @JoinColumn(name="PRODUCT_SKU_ID")
 	private Set<ProductSkuStock> stocks = new HashSet<ProductSkuStock>(); 
 	
-	@ManyToMany(
-			fetch = FetchType.LAZY,
-	        targetEntity=org.hoteia.qalingo.core.domain.Retailer.class,
-	        cascade={CascadeType.PERSIST, CascadeType.MERGE}
-	    )
-    @JoinTable(
-	        name="TECO_PRODUCT_SKU_RETAILER_REL",
-	        joinColumns=@JoinColumn(name="PRODUCT_SKU_ID"),
-	        inverseJoinColumns=@JoinColumn(name="RETAILER_ID")
-	    )	
+    @ManyToMany(fetch = FetchType.LAZY, targetEntity = org.hoteia.qalingo.core.domain.Retailer.class)
+    @JoinTable(name = "TECO_PRODUCT_SKU_RETAILER_REL", joinColumns = @JoinColumn(name = "PRODUCT_SKU_ID"), inverseJoinColumns = @JoinColumn(name = "RETAILER_ID"))
 	private Set<Retailer> retailers = new HashSet<Retailer>();
 	
 	@Temporal(TemporalType.TIMESTAMP)
@@ -248,6 +240,18 @@ public class ProductSku extends AbstractEntity {
 		return prices;
 	}
 	
+	public ProductSkuPrice getPrice(final Long marketAreaId, final Long retailerId){
+	    if(prices != null){
+	        for (ProductSkuPrice productSkuPrice : prices) {
+	            if(productSkuPrice.getMarketAreaId().equals(marketAreaId) 
+	                    && productSkuPrice.getRetailerId().equals(retailerId)) {
+	                return productSkuPrice;
+	            }
+	        }    
+	    }
+	    return null;
+	}
+	
 	public void setPrices(Set<ProductSkuPrice> prices) {
 		this.prices = prices;
 	}
@@ -320,7 +324,7 @@ public class ProductSku extends AbstractEntity {
 		ProductSkuAttribute productSkuAttributeToReturn = null;
 		List<ProductSkuAttribute> productSkuAttributesFilter = new ArrayList<ProductSkuAttribute>();
 		if(productSkuAttributes != null) {
-			// GET ALL CategoryAttributes FOR THIS ATTRIBUTE
+			// GET ALL ProductSkuAttributes FOR THIS ATTRIBUTE
 			for (Iterator<ProductSkuAttribute> iterator = productSkuAttributes.iterator(); iterator.hasNext();) {
 				ProductSkuAttribute productSkuAttribute = (ProductSkuAttribute) iterator.next();
 				AttributeDefinition attributeDefinition = productSkuAttribute.getAttributeDefinition();
@@ -329,7 +333,7 @@ public class ProductSku extends AbstractEntity {
 					productSkuAttributesFilter.add(productSkuAttribute);
 				}
 			}
-			// REMOVE ALL CategoryAttributes NOT ON THIS MARKET AREA
+			// REMOVE ALL ProductSkuAttributes NOT ON THIS MARKET AREA
 			if(marketAreaId != null) {
 				for (Iterator<ProductSkuAttribute> iterator = productSkuAttributesFilter.iterator(); iterator.hasNext();) {
 					ProductSkuAttribute productSkuAttribute = (ProductSkuAttribute) iterator.next();
@@ -342,7 +346,7 @@ public class ProductSku extends AbstractEntity {
 					}
 				}
 			}
-			// FINALLY RETAIN ONLY CategoryAttributes FOR THIS LOCALIZATION CODE
+			// FINALLY RETAIN ONLY ProductSkuAttributes FOR THIS LOCALIZATION CODE
 			if(StringUtils.isNotEmpty(localizationCode)) {
 				for (Iterator<ProductSkuAttribute> iterator = productSkuAttributesFilter.iterator(); iterator.hasNext();) {
 					ProductSkuAttribute productSkuAttribute = (ProductSkuAttribute) iterator.next();
@@ -355,7 +359,7 @@ public class ProductSku extends AbstractEntity {
 				if(productSkuAttributesFilter.size() == 0){
 					// TODO : warning ?
 
-					// NOT ANY CategoryAttributes FOR THIS LOCALIZATION CODE - GET A FALLBACK
+					// NOT ANY ProductSkuAttributes FOR THIS LOCALIZATION CODE - GET A FALLBACK
 					for (Iterator<ProductSkuAttribute> iterator = productSkuAttributes.iterator(); iterator.hasNext();) {
 						ProductSkuAttribute productSkuAttribute = (ProductSkuAttribute) iterator.next();
 						
@@ -397,6 +401,22 @@ public class ProductSku extends AbstractEntity {
 	public Integer getOrder(Long marketAreaId) {
 		return (Integer) getValue(ProductSkuAttribute.PRODUCT_SKU_ATTRIBUTE_ORDER, marketAreaId, null);
 	}
+	
+    public Integer getWidth() {
+        return (Integer) getValue(ProductSkuAttribute.PRODUCT_SKU_ATTRIBUTE_WIDTH, null, null);
+    }
+    
+    public Integer getHeight() {
+        return (Integer) getValue(ProductSkuAttribute.PRODUCT_SKU_ATTRIBUTE_HEIGHT, null, null);
+    }
+    
+    public Integer getLength() {
+        return (Integer) getValue(ProductSkuAttribute.PRODUCT_SKU_ATTRIBUTE_LENGTH, null, null);
+    }
+    
+    public Integer getWeight() {
+        return (Integer) getValue(ProductSkuAttribute.PRODUCT_SKU_ATTRIBUTE_WEIGHT, null, null);
+    }
 
 	// ASSET
 	public Asset getDefaultPaskshotImage(String size) {
@@ -406,7 +426,7 @@ public class ProductSku extends AbstractEntity {
 			for (Iterator<Asset> iterator = getAssetsIsGlobal().iterator(); iterator.hasNext();) {
 				Asset productAsset = (Asset) iterator.next();
 				if(AssetType.PACKSHOT.equals(productAsset.getType())
-						&& size.equals(productAsset.getSize())
+						&& size.equals(productAsset.getSize().name())
 						&& productAsset.isDefault()){
 					defaultProductImage = productAsset;
 				}
@@ -461,79 +481,48 @@ public class ProductSku extends AbstractEntity {
 		}
 		return defaultProductImage;
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((businessName == null) ? 0 : businessName.hashCode());
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		result = prime * result
-				+ ((dateCreate == null) ? 0 : dateCreate.hashCode());
-		result = prime * result
-				+ ((dateUpdate == null) ? 0 : dateUpdate.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (isDefault ? 1231 : 1237);
-		result = prime * result + version;
-		return result;
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ProductSku other = (ProductSku) obj;
-		if (businessName == null) {
-			if (other.businessName != null)
-				return false;
-		} else if (!businessName.equals(other.businessName))
-			return false;
-		if (code == null) {
-			if (other.code != null)
-				return false;
-		} else if (!code.equals(other.code))
-			return false;
-		if (dateCreate == null) {
-			if (other.dateCreate != null)
-				return false;
-		} else if (!dateCreate.equals(other.dateCreate))
-			return false;
-		if (dateUpdate == null) {
-			if (other.dateUpdate != null)
-				return false;
-		} else if (!dateUpdate.equals(other.dateUpdate))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (isDefault != other.isDefault)
-			return false;
-		if (version != other.version)
-			return false;
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((code == null) ? 0 : code.hashCode());
+        result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return "ProductSku [id=" + id + ", version=" + version
-				+ ", businessName=" + businessName + ", description="
-				+ description + ", isDefault=" + isDefault + ", code=" + code
-				+ ", dateCreate=" + dateCreate + ", dateUpdate=" + dateUpdate
-				+ "]";
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ProductSku other = (ProductSku) obj;
+        if (code == null) {
+            if (other.code != null)
+                return false;
+        } else if (!code.equals(other.code))
+            return false;
+        if (dateCreate == null) {
+            if (other.dateCreate != null)
+                return false;
+        } else if (!dateCreate.equals(other.dateCreate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductSku [id=" + id + ", version=" + version + ", businessName=" + businessName + ", description=" + description + ", isDefault=" + isDefault + ", code=" + code + ", dateCreate="
+                + dateCreate + ", dateUpdate=" + dateUpdate + "]";
+    }
 	
 }

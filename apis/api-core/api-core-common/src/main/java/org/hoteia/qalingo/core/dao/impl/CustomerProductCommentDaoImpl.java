@@ -29,14 +29,14 @@ public class CustomerProductCommentDaoImpl extends AbstractGenericDaoImpl implem
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public CustomerProductComment getCustomerProductCommentById(final Long customerProductCommentId) {
-        Criteria criteria = getSession().createCriteria(CustomerProductComment.class);
+        Criteria criteria = createDefaultCriteria(CustomerProductComment.class);
         criteria.add(Restrictions.eq("id", customerProductCommentId));
         CustomerProductComment customerProductComments = (CustomerProductComment) criteria.uniqueResult();
         return customerProductComments;
 	}
 	
 	public List<CustomerProductComment> findCustomerProductCommentByCustomerId(final Long customerId) {
-        Criteria criteria = getSession().createCriteria(CustomerProductComment.class);
+        Criteria criteria = createDefaultCriteria(CustomerProductComment.class);
         criteria.add(Restrictions.eq("customerId", customerId));
 
         criteria.addOrder(Order.asc("id"));
@@ -48,7 +48,7 @@ public class CustomerProductCommentDaoImpl extends AbstractGenericDaoImpl implem
 	}
 	
 	public List<CustomerProductComment> findCustomerProductCommentByProductSkuId(final Long productSkuId) {
-        Criteria criteria = getSession().createCriteria(CustomerProductComment.class);
+        Criteria criteria = createDefaultCriteria(CustomerProductComment.class);
         criteria.add(Restrictions.eq("productSkuId", productSkuId));
 
         criteria.addOrder(Order.asc("id"));
@@ -59,16 +59,22 @@ public class CustomerProductCommentDaoImpl extends AbstractGenericDaoImpl implem
 		return customerProductComments;
 	}
 
-	public void saveOrUpdateCustomerProductComment(final CustomerProductComment customerProductComment) {
+	public CustomerProductComment saveOrUpdateCustomerProductComment(final CustomerProductComment customerProductComment) {
 		if(customerProductComment.getDateCreate() == null){
 			customerProductComment.setDateCreate(new Date());
 		}
 		customerProductComment.setDateUpdate(new Date());
-		if(customerProductComment.getId() == null){
-			em.persist(customerProductComment);
-		} else {
-			em.merge(customerProductComment);
-		}
+        if (customerProductComment.getId() != null) {
+            if(em.contains(customerProductComment)){
+                em.refresh(customerProductComment);
+            }
+            CustomerProductComment mergedCustomerProductComment = em.merge(customerProductComment);
+            em.flush();
+            return mergedCustomerProductComment;
+        } else {
+            em.persist(customerProductComment);
+            return customerProductComment;
+        }
 	}
 
 	public void deleteCustomerProductComment(final CustomerProductComment customerProductComment) {

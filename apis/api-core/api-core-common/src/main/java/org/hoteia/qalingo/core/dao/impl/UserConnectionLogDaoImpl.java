@@ -28,14 +28,14 @@ public class UserConnectionLogDaoImpl extends AbstractGenericDaoImpl implements 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public UserConnectionLog getUserConnectionLogById(final Long userConnectionLogId) {
-        Criteria criteria = getSession().createCriteria(UserConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(UserConnectionLog.class);
         criteria.add(Restrictions.eq("id", userConnectionLogId));
         UserConnectionLog userConnectionLog = (UserConnectionLog) criteria.uniqueResult();
         return userConnectionLog;
 	}
 
 	public List<UserConnectionLog> findUserConnectionLogsByUserId(final Long userId) {
-        Criteria criteria = getSession().createCriteria(UserConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(UserConnectionLog.class);
         criteria.add(Restrictions.eq("userId", userId));
 
         criteria.addOrder(Order.asc("loginDate"));
@@ -46,7 +46,7 @@ public class UserConnectionLogDaoImpl extends AbstractGenericDaoImpl implements 
 	}
 	
 	public List<UserConnectionLog> findUserConnectionLogsByUserIdAndAppCode(final Long userId, final String appCode) {
-        Criteria criteria = getSession().createCriteria(UserConnectionLog.class);
+        Criteria criteria = createDefaultCriteria(UserConnectionLog.class);
         criteria.add(Restrictions.eq("userId", userId));
         criteria.add(Restrictions.eq("app", appCode));
         
@@ -57,12 +57,18 @@ public class UserConnectionLogDaoImpl extends AbstractGenericDaoImpl implements 
 		return userConnectionLogs;
 	}
 
-	public void saveOrUpdateUserConnectionLog(final UserConnectionLog userConnectionLog) {
-		if(userConnectionLog.getId() == null){
-			em.persist(userConnectionLog);
-		} else {
-			em.merge(userConnectionLog);
-		}
+	public UserConnectionLog saveOrUpdateUserConnectionLog(final UserConnectionLog userConnectionLog) {
+        if (userConnectionLog.getId() != null) {
+            if(em.contains(userConnectionLog)){
+                em.refresh(userConnectionLog);
+            }
+            UserConnectionLog mergedUserConnectionLog = em.merge(userConnectionLog);
+            em.flush();
+            return mergedUserConnectionLog;
+        } else {
+            em.persist(userConnectionLog);
+            return userConnectionLog;
+        }
 	}
 
 	public void deleteUserConnectionLog(final UserConnectionLog userConnectionLog) {

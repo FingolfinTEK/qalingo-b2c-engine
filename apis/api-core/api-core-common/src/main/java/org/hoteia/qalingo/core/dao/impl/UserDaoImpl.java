@@ -27,14 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @Repository("userDao")
-public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements UserDao {
+public class UserDaoImpl extends AbstractGenericDaoImpl implements UserDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // USER
     
     public User getUserById(final Long userId) {
-        Criteria criteria = getSession().createCriteria(User.class);
+        Criteria criteria = createDefaultCriteria(User.class);
         addDefaultUserFetch(criteria);
         criteria.add(Restrictions.eq("id", userId));
         
@@ -43,7 +43,7 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
     }
 
     public User getUserByLoginOrEmail(final String usernameOrEmail) {
-        Criteria criteria = getSession().createCriteria(User.class);
+        Criteria criteria = createDefaultCriteria(User.class);
         addDefaultUserFetch(criteria);
         criteria.add(Restrictions.or(Restrictions.eq("login", usernameOrEmail), Restrictions.eq("email", usernameOrEmail)));
         criteria.add(Restrictions.eq("active", true));
@@ -53,7 +53,7 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
     }
 
     public List<User> findUsers() {
-        Criteria criteria = getSession().createCriteria(User.class);
+        Criteria criteria = createDefaultCriteria(User.class);
         addDefaultUserFetch(criteria);
         criteria.addOrder(Order.asc("lastname"));
         criteria.addOrder(Order.asc("firstname"));
@@ -63,15 +63,21 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
         return users;
     }
 
-    public void saveOrUpdateUser(User user) {
+    public User saveOrUpdateUser(User user) {
         if (user.getDateCreate() == null) {
             user.setDateCreate(new Date());
         }
         user.setDateUpdate(new Date());
-        if (user.getId() == null) {
-            em.persist(user);
+        if (user.getId() != null) {
+            if(em.contains(user)){
+                em.refresh(user);
+            }
+            User mergedUser = em.merge(user);
+            em.flush();
+            return mergedUser;
         } else {
-            em.merge(user);
+            em.persist(user);
+            return user;
         }
     }
 
@@ -96,7 +102,7 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
     // COMPANY
     
     public Company getCompanyById(final Long companyId) {
-        Criteria criteria = getSession().createCriteria(Company.class);
+        Criteria criteria = createDefaultCriteria(Company.class);
         addDefaultCompanyFetch(criteria);
         criteria.add(Restrictions.eq("id", companyId));
         Company company = (Company) criteria.uniqueResult();
@@ -104,7 +110,7 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
     }
     
     public List<Company> findCompanies() {
-        Criteria criteria = getSession().createCriteria(Company.class);
+        Criteria criteria = createDefaultCriteria(Company.class);
         addDefaultCompanyFetch(criteria);
         criteria.addOrder(Order.asc("name"));
 
@@ -117,15 +123,21 @@ public class UserDaoImpl extends AbstractGenericDaoImpl<User, Long> implements U
         criteria.setFetchMode("localizations", FetchMode.JOIN); 
     }
     
-    public void saveOrUpdateCompany(Company company) {
+    public Company saveOrUpdateCompany(Company company) {
         if (company.getDateCreate() == null) {
             company.setDateCreate(new Date());
         }
         company.setDateUpdate(new Date());
-        if (company.getId() == null) {
-            em.persist(company);
+        if (company.getId() != null) {
+            if(em.contains(company)){
+                em.refresh(company);
+            }
+            Company mergedCompany = em.merge(company);
+            em.flush();
+            return mergedCompany;
         } else {
-            em.merge(company);
+            em.persist(company);
+            return company;
         }
     }
 

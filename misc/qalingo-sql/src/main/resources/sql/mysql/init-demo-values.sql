@@ -7,10 +7,23 @@
 -- http://www.hoteia.com - http://twitter.com/hoteia - contact@hoteia.com
 --
 --
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 INSERT INTO tbo_company 
 (id, version, name, description, code, default_localization_id)
 VALUES (1, 1, 'Company demo', 'company demo description', 'CPD', 1);
+
+update tbo_company 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO tbo_company_localization_rel 
 (company_id, localization_id)
@@ -26,7 +39,8 @@ VALUES
 (1,9),
 (1,10),
 (1,11),
-(1,12);
+(1,12),
+(1,13);
 
 -- password equal "password"
 INSERT INTO tbo_user 
@@ -48,7 +62,7 @@ VALUES (1, 'MR', 'Customer', 'Qalingo', 'rue de versaille', '', '', 'address1', 
 
 INSERT INTO teco_customer_attribute 
 (id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, customer_id, attribute_definition_id, localization_code, market_area_id)
-VALUES (1, null, null, null, null, null, 'TEST ATTRIBUTE', 1, 10, null, null);
+VALUES (1, null, null, null, null, null, 'TEST ATTRIBUTE', 1, 100, null, null);
 
 INSERT INTO teco_customer_credential 
 (id, customer_id, password)
@@ -72,14 +86,21 @@ INSERT INTO teco_catalog_virtual
 (210, 'Virtual Catalog description', 'V_CAT_BRA', 0, 'Virtuel Catalog Brazil', 1, 1),
 (211, 'Virtual Catalog description', 'V_CAT_ARG', 0, 'Virtuel Catalog Argentina', 1, 1),
 (301, 'Virtual Catalog description', 'V_CAT_CHN', 0, 'Virtuel Catalog China', 1, 1),
-(302, 'Virtual Catalog description', 'V_CAT_JPN', 0, 'Virtuel Catalog Japan', 1, 1);
+(302, 'Virtual Catalog description', 'V_CAT_JPN', 0, 'Virtuel Catalog Japan', 1, 1),
+(303, 'Virtual Catalog description', 'V_CAT_VNM', 0, 'Virtuel Catalog Vietnam', 1, 1);
+
+update teco_catalog_virtual 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO teco_retailer 
-(id, name, description, code, is_brand, is_default, is_official_retailer)
+(id, name, description, code, is_brand, is_official_retailer)
  VALUES 
-(1, 'Default Retailer', 'Default Retailer', 'DRE', 0, 1, 0), 
-(2, 'Default Retailer', 'Brand Retailer', 'BRE', 1, 0, 0), 
-(3, 'Default Retailer', 'Official Retailer', 'ORE', 0, 0, 1);
+(1, 'Default Retailer', 'Default Retailer', 'DRE', 0, 0), 
+(2, 'Default Retailer', 'Brand Retailer', 'BRE', 1, 0), 
+(3, 'Default Retailer', 'Official Retailer', 'ORE', 0, 1);
+
+update teco_retailer 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO teco_retailer_address 
 (id, version, address1, address2, additional_information, postal_code, city, country_code, email, fax, mobile, phone, retailer_id, latitude, longitude, is_default)
@@ -99,14 +120,14 @@ INSERT INTO teco_marketplace
 INSERT INTO teco_marketplace_attribute   
 (id, context, string_value, market_place_id, attribute_definition_id)
 VALUES 
-(161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 1, 60),
-(162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 1, 60),
-(1161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 10, 60),
-(1162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 10, 60),
-(1261, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 20, 60),
-(1262, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 20, 60),
-(1361, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 30, 60),
-(1362, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 30, 60);
+(161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 1, 600),
+(162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 1, 600),
+(1161, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 10, 600),
+(1162, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 10, 600),
+(1261, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 20, 600),
+(1262, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 20, 600),
+(1361, 'FO_MCOMMERCE', 'fo-mcommerce.dev.qalingo.com', 30, 600),
+(1362, 'FO_PREHOME',   'fo-prehome.dev.qalingo.com', 30, 600);
 
 INSERT INTO teco_market 
 (id, description, code, theme, is_default, name, version, marketplace_id)
@@ -117,19 +138,19 @@ INSERT INTO teco_market
 (21, 'Market 4 = example South America', 'SAM', null, 0, 'South America', 1, 20),
 (30, 'Market 5 = example Asia', 'ASIA', null, 1, 'Asia', 1, 30);
 
-
 INSERT INTO teco_market_area 
-(id, description, name, code, theme, is_default, version, default_localization_id, market_id, virtual_catalog_id, currency_id, latitude, longitude)
+(id, description, name, code, theme, is_default, version, market_id, virtual_catalog_id, default_localization_id, default_retailer_id, default_currency_id, latitude, longitude)
  VALUES 
-(1, 'Market INT description', 'market area 1 : INT',   'INT', null, 1, 1, 1,  1, 100, 2, '-30.000', '45.000'),
-(101, 'Market FRA description', 'market area 2 : FRA', 'FRA', null, 1, 1, 2, 10, 101, 1, '48.480', '2.200'),	
-(102, 'Market ESP description', 'market area 3 : ESP', 'ESP', null, 1, 1, 3, 10, 102, 1, '40.260', '3.420'),	
-(201, 'Market USA description', 'market area 4 : USA', 'USA', null, 1, 1, 1, 20, 201, 2, '40.000', '-90.000'),
-(202, 'Market CAN description', 'market area 4 : CAN', 'CAN', null, 0, 1, 1, 20, 202, 4, '55.000', '-90.000'),
-(210, 'Market BRA description', 'market area 2 : BRA', 'BRA', null, 1, 1, 8, 21, 210, 2, '-22.570', '-43.120'),
-(211, 'Market ARG description', 'market area 2 : ARG', 'ARG', null, 1, 1, 3, 21, 211, 2, '-34.350', '-58.220'),
-(301, 'Market CHN description', 'market area 5 : CHN', 'CHN', null, 0, 1, 9, 30, 301, 5, '121.280', '31.100'),
-(302, 'Market JPN description', 'market area 6 : JPN', 'JPN', null, 1, 1, 7, 30, 302, 6, '35.400', '139.450');
+(  1, 'Market INT description', 'market area 1 : INT', 'INT', null, 1, 1,  1, 100, 1, 1, 150, '-30.000', '45.000'),
+(101, 'Market FRA description', 'market area 2 : FRA', 'FRA', null, 1, 1, 10, 101, 2, 1, 45, '48.480', '2.200'),	
+(102, 'Market ESP description', 'market area 3 : ESP', 'ESP', null, 1, 1, 10, 102, 3, 1, 45, '40.260', '3.420'),	
+(201, 'Market USA description', 'market area 4 : USA', 'USA', null, 1, 1, 20, 201, 1, 1, 150, '40.000', '-90.000'),
+(202, 'Market CAN description', 'market area 4 : CAN', 'CAN', null, 0, 1, 20, 202, 1, 1, 27, '55.000', '-90.000'),
+(210, 'Market BRA description', 'market area 2 : BRA', 'BRA', null, 1, 1, 21, 210, 8, 1, 21, '-22.570', '-43.120'),
+(211, 'Market ARG description', 'market area 2 : ARG', 'ARG', null, 1, 1, 21, 211, 3, 1, 8, '-34.350', '-58.220'),
+(301, 'Market CHN description', 'market area 5 : CHN', 'CHN', null, 0, 1, 30, 301, 9, 1, 31, '121.280', '31.100'),
+(302, 'Market JPN description', 'market area 6 : JPN', 'JPN', null, 1, 1, 30, 302, 7, 1, 72, '35.400', '139.450'),
+(303, 'Market VNM description', 'market area 7 : VNM', 'VNM', null, 0, 1, 30, 303, 13, 1, 154, '10.762622', '106.660172');
 
 /*
 (510, 'BO_BUSINESS',  'bo-business.dev.qalingo.com', 1, 5),
@@ -145,18 +166,23 @@ VALUES
 INSERT INTO teco_market_area_attribute   
 (id, context, string_value, market_area_id, attribute_definition_id)
 VALUES 
-(100, 'FO_MCOMMERCE', 'no-reply@YOURDOMAIN.com', 1, 1),
-(101, 'FO_MCOMMERCE',   'Demo Qalingo', 1, 2),
-(102, 'FO_MCOMMERCE',   'contact@YOURDOMAIN.com', 1, 3),
-(103, 'FO_MCOMMERCE',   'facebook,twitter', 1, 6);
-
-INSERT INTO teco_market_area_attribute   
-(id, context, string_value, market_area_id, attribute_definition_id)
-VALUES 
 (10, 'DEFAULT_CONTEXT', 'no-reply@YOURDOMAIN.com', 1, 1),
 (11, 'DEFAULT_CONTEXT', 'Demo Qalingo', 1, 2),
 (12, 'DEFAULT_CONTEXT', 'contact@YOURDOMAIN.com', 1, 3);
 
+INSERT INTO teco_market_area_attribute   
+(id, context, string_value, market_area_id, attribute_definition_id)
+VALUES 
+(20, 'DEFAULT_CONTEXT', true, 1, 7);
+
+
+INSERT INTO teco_market_area_attribute   
+(id, context, string_value, market_area_id, attribute_definition_id)
+VALUES 
+(100, 'FO_MCOMMERCE', 'no-reply@YOURDOMAIN.com', 1, 1),
+(101, 'FO_MCOMMERCE',   'Demo Qalingo', 1, 2),
+(102, 'FO_MCOMMERCE',   'contact@YOURDOMAIN.com', 1, 3),
+(103, 'FO_MCOMMERCE',   'facebook,twitter', 1, 6);
 
 INSERT INTO teco_market_area_localization_rel 
 (market_area_id, localization_id)
@@ -169,10 +195,11 @@ INSERT INTO teco_market_area_localization_rel
 (201, 1),
 (202, 1),
 (202, 2),
-(210, 9),
+(210, 8),
 (211, 3),
-(301, 7),
-(302, 8);
+(301, 9),
+(302, 7),
+(303, 13);
 
 INSERT INTO teco_market_area_retailer_rel 
 (market_area_id, retailer_id)
@@ -185,7 +212,23 @@ INSERT INTO teco_market_area_retailer_rel
 (210, 1),
 (211, 1),
 (301, 1),
-(302, 1);
+(302, 1),
+(303, 1);
+
+INSERT INTO teco_market_area_currency_rel 
+(market_area_id, currency_id)
+ VALUES 
+(1, 150),
+(1, 45),
+(101, 45),
+(102, 45),
+(201, 150),
+(202, 27),
+(210, 21),
+(211, 8),
+(301, 31),
+(302, 72),
+(303, 154);
 
 -- STORE
 
@@ -198,10 +241,18 @@ INSERT INTO teco_store
 INSERT INTO teco_store_attribute 
 (id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, store_id, attribute_definition_id, localization_code, market_area_id)
 VALUES 
-(10, null, null, null, null, null, 'New-York en i18n', 10, 51, 'en', null),
-(11, null, null, null, null, null, 'New-York fr i18n', 10, 51, 'fr', null),
-(20, null, null, null, null, null, 'Paris en i18n', 20, 51, 'en', null),
-(21, null, null, null, null, null, 'Paris fr i18n', 20, 51, 'fr', null);
+(10, null, null, null, null, null, 'New-York en i18n', 10, 510, 'en', null),
+(11, null, null, null, null, null, 'New-York fr i18n', 10, 510, 'fr', null),
+(20, null, null, null, null, null, 'Paris en i18n', 20, 510, 'en', null),
+(21, null, null, null, null, null, 'Paris fr i18n', 20, 510, 'fr', null);
+
+INSERT INTO teco_asset  
+(id, description, code, path, is_default, name, version, type, size, is_global, store_id, scope)
+ VALUES 
+(1001, 'image ...', 'IMG_STORE10_', 'store-1-img.png', 0, 'image 1 store 10', 1, 'PACKSHOT', 'SMALL', 1, 10, 'STORE'), 
+(1002, 'image ...', 'ICON_STORE10', 'store-1-icon.png', 0, 'icon 1 store 10', 1, 'ICON', null, 1, 10, 'STORE'),
+(1011, 'image ...', 'IMG_STORE20_', 'store-1-img.png', 0, 'image 1 store 20', 1, 'PACKSHOT', 'SMALL', 1, 20, 'STORE'), 
+(1012, 'image ...', 'ICON_STORE20', 'store-1-icon.png', 0, 'icon 1 store 20', 1, 'ICON', null, 1, 20, 'STORE');
 
 -- PRODUCT
 
@@ -214,6 +265,8 @@ INSERT INTO teco_product_brand
 (40, 'brand  4 description', 'BR40', 'Brand 4', 1),
 (50, 'brand  5 description', 'BR50', 'Brand 5', 1);
 
+update teco_product_brand 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO teco_catalog_master_category 
 (id, description, code, is_default, business_name, version)
@@ -289,7 +342,12 @@ INSERT INTO teco_catalog_virtual_category_virtual_rel
 (302, 20),
 (302, 30),
 (302, 40),
-(302, 50);
+(302, 50),
+(303, 10),
+(303, 20),
+(303, 30),
+(303, 40),
+(303, 50);
 
 INSERT INTO teco_catalog_master_category 
 (id, description, code, is_default, business_name, version, default_parent_category_id)
@@ -322,16 +380,16 @@ INSERT INTO teco_catalog_virtual_category
 INSERT INTO teco_catalog_virtual_category_attribute 
 (id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, virtual_category_id, attribute_definition_id, localization_code, market_area_id) 
 VALUES 
-(1,  null, null, null, null, null, 'Nouveautés Thé i18n',  101, 20, null, 1),
-(2,  null, null, null, null, null, 'Nouveautés Café i18n',  102, 20, null, 1),
-(3,  null, null, null, null, null, 'Fêtes des pères i18n',  201, 20, null, 1),
-(4,  null, null, null, null, null, 'Fêtes des mères i18n',  202, 20, null, 1),
-(5,  null, null, null, null, null, 'Brésil i18n',  301, 20, null, 1),
-(6,  null, null, null, null, null, 'Colombie i18n',  302, 20, null, 1),
-(7,  null, null, null, null, null, 'Inde i18n',  401, 20, null, 1),
-(8,  null, null, null, null, null, 'Anglais i18n',  402, 20, null, 1),
-(9,  null, null, null, null, null, 'Max Havelaar i18n',  501, 20, null, 1),
-(10, null, null, null, null, null, 'Artisans du Monde i18n', 502, 20, null, 1);
+(1,  null, null, null, null, null, 'Nouveautés Thé i18n',  101, 200, null, 1),
+(2,  null, null, null, null, null, 'Nouveautés Café i18n',  102, 200, null, 1),
+(3,  null, null, null, null, null, 'Fêtes des pères i18n',  201, 200, null, 1),
+(4,  null, null, null, null, null, 'Fêtes des mères i18n',  202, 200, null, 1),
+(5,  null, null, null, null, null, 'Brésil i18n',  301, 200, null, 1),
+(6,  null, null, null, null, null, 'Colombie i18n',  302, 200, null, 1),
+(7,  null, null, null, null, null, 'Inde i18n',  401, 200, null, 1),
+(8,  null, null, null, null, null, 'Anglais i18n',  402, 200, null, 1),
+(9,  null, null, null, null, null, 'Max Havelaar i18n',  501, 200, null, 1),
+(10, null, null, null, null, null, 'Artisans du Monde i18n', 502, 200, null, 1);
 
 INSERT INTO teco_catalog_master_category_child_category_rel  
 (parent_master_catalog_category_id, child_master_catalog_category_id)
@@ -362,20 +420,45 @@ INSERT INTO teco_catalog_virtual_category_child_category_rel
 (50, 502);
 
 INSERT INTO teco_product_marketing 
-(id, description, code, is_default, business_name, version, brand_id)
+(id, description, code, is_default, business_name, version, brand_id, default_catalog_category_id)
  VALUES 
-(1, 'product marketing 1', 'PROD1', 1, 'Produit l', 1, 10), 
-(2, 'product marketing 2', 'PROD2', 0, 'Produit 2', 1, 10), 
-(3, 'product marketing 3', 'PROD3', 0, 'Produit 3', 1, 10), 
-(4, 'product marketing 4', 'PROD4', 0, 'Produit 4', 1, 20);
+(1, 'product marketing 1', 'PROD1', 1, 'Produit l', 1, 10, 302), 
+(2, 'product marketing 2', 'PROD2', 0, 'Produit 2', 1, 10, 302), 
+(3, 'product marketing 3', 'PROD3', 0, 'Produit 3', 1, 10, 302), 
+(4, 'product marketing 4', 'PROD4', 0, 'Produit 4', 1, 20, 401),
+--add
+(5, 'product marketing 5', 'PROD5', 0, 'Produit 5', 1, 20, 401),
+(6, 'product marketing 6', 'PROD6', 0, 'Produit 6', 1, 20, 401),
+(7, 'product marketing 7', 'PROD7', 0, 'Produit 7', 1, 20, 401),
+(8, 'product marketing 8', 'PROD8', 0, 'Produit 8', 1, 20, 401),
+(9, 'product marketing 9', 'PROD9', 0, 'Produit 9', 1, 20, 401),
+(10, 'product marketing 10', 'PROD10', 0, 'Produit 10', 1, 20, 401),
+(11, 'product marketing 11', 'PROD11', 0, 'Produit 11', 1, 20, 401),
+(12, 'product marketing 12', 'PROD12', 0, 'Produit 12', 1, 20, 401),
+(13, 'product marketing 13', 'PROD13', 0, 'Produit 13', 1, 20, 401),
+(14, 'product marketing 14', 'PROD14', 0, 'Produit 14', 1, 20, 401);
+
+update teco_product_marketing 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO teco_product_marketing_attribute 
 (id, blob_value, boolean_value, double_value, float_value, integer_value, string_value, product_marketing_id, attribute_definition_id, localization_code, market_area_id) 
 VALUES 
-(1, null, null, null, null, null, 'PROD1 i18n', 1, 30, null, 1),
-(2, null, null, null, null, null, 'PROD2 i18n', 2, 30, null, 1),
-(3, null, null, null, null, null, 'PROD3 i18n', 3, 30, null, 1),
-(4, null, null, null, null, null, 'PROD4 i18n', 4, 30, null, 1);
+(1, null, null, null, null, null, 'PROD1 i18n', 1, 300, null, 1),
+(2, null, null, null, null, null, 'PROD2 i18n', 2, 300, null, 1),
+(3, null, null, null, null, null, 'PROD3 i18n', 3, 300, null, 1),
+(4, null, null, null, null, null, 'PROD4 i18n', 4, 300, null, 1),
+----add
+(5, null, null, null, null, null, 'PROD5 i18n', 5, 300, null, 1),
+(6, null, null, null, null, null, 'PROD6 i18n', 6, 300, null, 1),
+(7, null, null, null, null, null, 'PROD7 i18n', 7, 300, null, 1),
+(8, null, null, null, null, null, 'PROD8 i18n', 8, 300, null, 1),
+(9, null, null, null, null, null, 'PROD9 i18n', 9, 300, null, 1),
+(10, null, null, null, null, null, 'PROD10 i18n', 10, 300, null, 1),
+(11, null, null, null, null, null, 'PROD11 i18n', 11, 300, null, 1),
+(12, null, null, null, null, null, 'PROD12 i18n', 12, 300, null, 1),
+(13, null, null, null, null, null, 'PROD13 i18n', 13, 300, null, 1),
+(14, null, null, null, null, null, 'PROD14 i18n', 14, 300, null, 1);
 
 INSERT INTO teco_product_sku 
 (id, description, code, is_default, business_name, version, product_marketing_id)
@@ -385,7 +468,21 @@ INSERT INTO teco_product_sku
 (3, 'prod 1 product sku 3', 'SKU13', 0, 'Sku 13', 1, 1),
 (4, 'prod 2 product sku 1', 'SKU21', 0, 'Sku 21', 1, 2),
 (5, 'prod 3 product sku 1', 'SKU31', 0, 'Sku 31', 1, 3),
-(6, 'prod 4 product sku 1', 'SKU41', 0, 'Sku 41', 1, 4);
+(6, 'prod 4 product sku 1', 'SKU41', 0, 'Sku 41', 1, 4),
+--add
+(7, 'prod 5 product sku 1', 'SKU51', 0, 'Sku 51', 1, 5),
+(8, 'prod 6 product sku 1', 'SKU61', 0, 'Sku 61', 1, 6),
+(9, 'prod 7 product sku 1', 'SKU71', 0, 'Sku 71', 1, 7),
+(10, 'prod 8 product sku 1', 'SKU81', 0, 'Sku 81', 1, 8),
+(11, 'prod 9 product sku 1', 'SKU91', 0, 'Sku 91', 1, 9),
+(12, 'prod 10 product sku 1', 'SKU101', 0, 'Sku 101', 1, 10),
+(13, 'prod 11 product sku 1', 'SKU111', 0, 'Sku 111', 1, 11),
+(14, 'prod 12 product sku 1', 'SKU121', 0, 'Sku 121', 1, 12),
+(15, 'prod 13 product sku 1', 'SKU131', 0, 'Sku 131', 1, 13),
+(16, 'prod 14 product sku 1', 'SKU141', 0, 'Sku 141', 1, 14);
+
+update teco_product_sku 
+set description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
 
 INSERT INTO teco_catalog_master_category_product_marketing_rel  
 (master_category_id, product_marketing_id)
@@ -393,7 +490,25 @@ INSERT INTO teco_catalog_master_category_product_marketing_rel
 (302, 1), 
 (302, 2), 
 (302, 3),
-(401, 4);
+(401, 4),
+--add
+(401, 5),
+(401, 6),
+(401, 7),
+(401, 8),
+(301, 9),
+(301, 10),
+(301, 11),
+(501, 12),
+(501, 13),
+(402, 14),
+--product in multi cate
+(301, 1),
+(401, 1),
+(402, 2),
+(402, 5),
+(402, 6),
+(501, 3);
 
 INSERT INTO teco_catalog_virtual_category_product_marketing_rel  
 (virtual_category_id, product_marketing_id)
@@ -401,89 +516,179 @@ INSERT INTO teco_catalog_virtual_category_product_marketing_rel
 (302, 1), 
 (302, 2), 
 (302, 3),
-(401, 4);
+(401, 4),
+--add
+(401, 5),
+(401, 6),
+(401, 7),
+(401, 8),
+(301, 9),
+(301, 10),
+(301, 11),
+(501, 12),
+(501, 13),
+(402, 14),
+--product in multi cate
+(301, 1),
+(401, 1),
+(402, 2),
+(402, 5),
+(402, 6),
+(501, 3);
 
 INSERT INTO teco_product_marketing_attribute
 (BOOLEAN_VALUE,IS_GLOBAL,MARKET_AREA_ID,ORDERING,VERSION,ATTRIBUTE_DEFINITION_ID,PRODUCT_MARKETING_ID)
-VALUES (1,0,1,0,1,52,1), (1,0,1,0,1,52,2), (1,0,1,0,1,52,3), (1,0,1,0,1,52,4);
+VALUES (1,0,1,0,1,520,1), (1,0,1,0,1,520,2), (1,0,1,0,1,520,3), (1,0,1,0,1,520,4);
 
 -- PRICE
 
 -- MARKET PLACE INT
 INSERT INTO teco_product_sku_price  
-(id, market_area_id, price, retailer_id, currency_id, product_sku_id)
+(id, market_area_id, price_catalog, retailer_id, currency_id, product_sku_id)
 VALUES 
-(30, 1, 14.35, 1, 2, 1),
-(40, 1, 15.35, 1, 2, 2),
-(50, 1, 16.35, 1, 2, 3),
-(60, 1, 17.35, 1, 2, 4);
+(30, 1, 14.35, 1, 150, 1),
+(40, 1, 15.35, 1, 150, 2),
+(50, 1, 16.35, 1, 150, 3),
+(60, 1, 15.35, 1, 150, 4),
+(70, 1, 16.35, 1, 150, 5),
+(80, 1, 17.35, 1, 150, 6),
+--add
+(90, 1, 13.35, 1, 150, 7),
+(100, 1, 19.35, 1, 150, 8),
+(110, 1, 12.35, 1, 150, 9),
+(120, 1, 14.35, 1, 150, 10),
+(1301, 1, 16.35, 1, 150, 11),
+(1401, 1, 18.35, 1, 150, 12),
+(1501, 1, 15.35, 1, 150, 13),
+(1601, 1, 10.35, 1, 150, 14),
+(1701, 1, 15.35, 1, 150, 15),
+(1801, 1, 10.35, 1, 150, 16);
+
 
 -- MARKET PLACE EUR
 INSERT INTO teco_product_sku_price  
-(id, market_area_id, price, retailer_id, currency_id, product_sku_id)
+(id, market_area_id, price_catalog, retailer_id, currency_id, product_sku_id)
 VALUES 
-(130, 101, 14.45, 1, 1, 1),
-(140, 101, 15.45, 1, 1, 2),
-(150, 101, 16.45, 1, 1, 3),
-(160, 101, 17.45, 1, 1, 4),
-(230, 102, 14.45, 1, 1, 1),
-(240, 102, 15.45, 1, 1, 2),
-(250, 102, 16.45, 1, 1, 3),
-(260, 102, 17.45, 1, 1, 4);
+(130, 101, 14.45, 1, 45, 1),
+(140, 101, 15.45, 1, 45, 2),
+(150, 101, 16.45, 1, 45, 3),
+(160, 101, 17.45, 1, 45, 4),
+(170, 101, 16.45, 1, 45, 5),
+(180, 101, 17.45, 1, 45, 6),
+(230, 102, 14.45, 1, 45, 1),
+(240, 102, 15.45, 1, 45, 2),
+(250, 102, 16.45, 1, 45, 3),
+(260, 102, 15.45, 1, 45, 4),
+(270, 102, 16.45, 1, 45, 5),
+(280, 102, 17.45, 1, 45, 6);
 
 INSERT INTO teco_asset  
 (id, description, code, path, is_default, name, version, type, size, is_global, master_category_id, scope)
  VALUES 
-(1, 'image ...', 'CAT_IMG1', 'cat-1-img-1.jpg', 0, 'image 5', 1, 'BACKGROUND', null, 1, 10, 'MASTER_CATEGORY'), 
-(2, 'image ...', 'CAT_IMG2', 'cat-1-img-1.jpg', 0, 'image 6', 1, 'BACKGROUND', null, 1, 20, 'MASTER_CATEGORY'), 
-(3, 'image ...', 'CAT_IMG3', 'cat-1-img-1.jpg', 0, 'image 7', 1, 'BACKGROUND', null, 1, 30, 'MASTER_CATEGORY'), 
-(4, 'image ...', 'CAT_IMG4', 'cat-1-img-1.jpg', 0, 'image 8', 1, 'BACKGROUND', null, 1, 40, 'MASTER_CATEGORY'), 
-(5, 'image ...', 'CAT_IMG5', 'cat-1-img-1.jpg', 0, 'image 9', 1, 'BACKGROUND', null, 1, 50, 'MASTER_CATEGORY'),
-(6, 'image ...', 'CAT_IMG6', 'cat-1-img-1-small.png', 1, 'image 10', 1, 'PACKSHOT', 'SMALL', 1, 10, 'MASTER_CATEGORY'), 
-(7, 'image ...', 'CAT_IMG7', 'cat-1-img-1-small.jpg', 0, 'image 11', 1, 'PACKSHOT', 'SMALL', 1, 20, 'MASTER_CATEGORY'), 
-(8, 'image ...', 'CAT_IMG8', 'cat-1-img-1-small.jpg', 0, 'image 12', 1, 'PACKSHOT', 'SMALL', 1, 30, 'MASTER_CATEGORY'), 
-(9, 'image ...', 'CAT_IMG9', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 40, 'MASTER_CATEGORY'),
-(10, 'image ...', 'CAT_IMG9', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 50, 'MASTER_CATEGORY');
+(1,  'image ...', 'MCAT_BACKGROUND_10', 'cat-1-img-1.jpg', 0, 'image 5', 1, 'BACKGROUND', null, 1, 10, 'MASTER_CATEGORY'), 
+(2,  'image ...', 'MCAT_BACKGROUND_20', 'cat-1-img-1.jpg', 0, 'image 6', 1, 'BACKGROUND', null, 1, 20, 'MASTER_CATEGORY'), 
+(3,  'image ...', 'MCAT_BACKGROUND_30', 'cat-1-img-1.jpg', 0, 'image 7', 1, 'BACKGROUND', null, 1, 30, 'MASTER_CATEGORY'), 
+(4,  'image ...', 'MCAT_BACKGROUND_40', 'cat-1-img-1.jpg', 0, 'image 8', 1, 'BACKGROUND', null, 1, 40, 'MASTER_CATEGORY'), 
+(5,  'image ...', 'MCAT_BACKGROUND_50', 'cat-1-img-1.jpg', 0, 'image 9', 1, 'BACKGROUND', null, 1, 50, 'MASTER_CATEGORY'),
+(6,  'image ...', 'MCAT_PACKSHOT_10', 'cat-1-img-1-small.png', 1, 'image 10', 1, 'PACKSHOT', 'SMALL', 1, 10, 'MASTER_CATEGORY'), 
+(7,  'image ...', 'MCAT_PACKSHOT_20', 'cat-1-img-1-small.jpg', 0, 'image 11', 1, 'PACKSHOT', 'SMALL', 1, 20, 'MASTER_CATEGORY'), 
+(8,  'image ...', 'MCAT_PACKSHOT_30', 'cat-1-img-1-small.jpg', 0, 'image 12', 1, 'PACKSHOT', 'SMALL', 1, 30, 'MASTER_CATEGORY'), 
+(9,  'image ...', 'MCAT_PACKSHOT_40', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 40, 'MASTER_CATEGORY'),
+(10, 'image ...', 'MCAT_PACKSHOT_50', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 50, 'MASTER_CATEGORY');
 
 INSERT INTO teco_asset  
 (id, description, code, path, is_default, name, version, type, size, is_global, virtual_category_id, scope)
  VALUES 
-(11, 'image ...', 'CAT_IMG1', 'cat-1-img-1.jpg', 0, 'image 5', 1, 'BACKGROUND', null, 1, 10, 'VIRTUAL_CATEGORY'), 
-(12, 'image ...', 'CAT_IMG2', 'cat-1-img-1.jpg', 0, 'image 6', 1, 'BACKGROUND', null, 1, 20, 'VIRTUAL_CATEGORY'), 
-(13, 'image ...', 'CAT_IMG3', 'cat-1-img-1.jpg', 0, 'image 7', 1, 'BACKGROUND', null, 1, 30, 'VIRTUAL_CATEGORY'), 
-(14, 'image ...', 'CAT_IMG4', 'cat-1-img-1.jpg', 0, 'image 8', 1, 'BACKGROUND', null, 1, 40, 'VIRTUAL_CATEGORY'), 
-(15, 'image ...', 'CAT_IMG5', 'cat-1-img-1.jpg', 0, 'image 9', 1, 'BACKGROUND', null, 1, 50, 'VIRTUAL_CATEGORY'),
-(16, 'image ...', 'CAT_IMG6', 'cat-1-img-1-small.png', 1, 'image 10', 1, 'PACKSHOT', 'SMALL', 1, 10, 'VIRTUAL_CATEGORY'), 
-(17, 'image ...', 'CAT_IMG7', 'cat-1-img-1-small.jpg', 0, 'image 11', 1, 'PACKSHOT', 'SMALL', 1, 20, 'VIRTUAL_CATEGORY'), 
-(18, 'image ...', 'CAT_IMG8', 'cat-1-img-1-small.jpg', 0, 'image 12', 1, 'PACKSHOT', 'SMALL', 1, 30, 'VIRTUAL_CATEGORY'), 
-(19, 'image ...', 'CAT_IMG9', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 40, 'VIRTUAL_CATEGORY'),
-(20, 'image ...', 'CAT_IMG9', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 50, 'VIRTUAL_CATEGORY');
+(11, 'image ...', 'VCAT_BACKGROUND_10', 'cat-1-img-1.jpg', 0, 'image 5', 1, 'BACKGROUND', null, 1, 10, 'VIRTUAL_CATEGORY'), 
+(12, 'image ...', 'VCAT_BACKGROUND_20', 'cat-1-img-1.jpg', 0, 'image 6', 1, 'BACKGROUND', null, 1, 20, 'VIRTUAL_CATEGORY'), 
+(13, 'image ...', 'VCAT_BACKGROUND_30', 'cat-1-img-1.jpg', 0, 'image 7', 1, 'BACKGROUND', null, 1, 30, 'VIRTUAL_CATEGORY'), 
+(14, 'image ...', 'VCAT_BACKGROUND_40', 'cat-1-img-1.jpg', 0, 'image 8', 1, 'BACKGROUND', null, 1, 40, 'VIRTUAL_CATEGORY'), 
+(15, 'image ...', 'VCAT_BACKGROUND_50', 'cat-1-img-1.jpg', 0, 'image 9', 1, 'BACKGROUND', null, 1, 50, 'VIRTUAL_CATEGORY'),
+(16, 'image ...', 'VCAT_PACKSHOT_10', 'cat-1-img-1-small.png', 1, 'image 10', 1, 'PACKSHOT', 'SMALL', 1, 10, 'VIRTUAL_CATEGORY'), 
+(17, 'image ...', 'VCAT_PACKSHOT_20', 'cat-1-img-1-small.jpg', 0, 'image 11', 1, 'PACKSHOT', 'SMALL', 1, 20, 'VIRTUAL_CATEGORY'), 
+(18, 'image ...', 'VCAT_PACKSHOT_30', 'cat-1-img-1-small.jpg', 0, 'image 12', 1, 'PACKSHOT', 'SMALL', 1, 30, 'VIRTUAL_CATEGORY'), 
+(19, 'image ...', 'VCAT_PACKSHOT_40', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 40, 'VIRTUAL_CATEGORY'),
+(20, 'image ...', 'VCAT_PACKSHOT_50', 'cat-1-img-1-small.jpg', 0, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 50, 'VIRTUAL_CATEGORY');
+
+INSERT INTO teco_asset  
+(id, description, code, path, is_default, name, version, type, size, is_global, virtual_category_id, scope)
+ VALUES 
+(301, 'image ...', 'VCAT_SLIDESHOW_301', 'cat-1-img-1.jpg', 0, 'image 5', 1, 'SLIDESHOW', null, 1, 301, 'VIRTUAL_CATEGORY'), 
+(302, 'image ...', 'VCAT_SLIDESHOW_302', 'cat-1-img-1.jpg', 0, 'image 6', 1, 'SLIDESHOW', null, 1, 302, 'VIRTUAL_CATEGORY');
 
 INSERT INTO teco_asset  
 (id, description, code, path, is_default, name, version, type, size, is_global, product_marketing_id, scope)
  VALUES 
-(21, 'image ...', 'PM_IMG1', 'prod-1-img-1.png', 1, 'image l', 1, 'PACKSHOT', 'SMALL', 1, 1, 'PRODUCT_MARKETING'), 
-(22, 'image ...', 'PM_IMG2', 'prod-1-img-1.png', 0, 'image 2', 1, 'PACKSHOT', 'SMALL', 1, 2, 'PRODUCT_MARKETING'), 
-(23, 'image ...', 'PM_IMG3', 'prod-1-img-1.png', 0, 'image 3', 1, 'PACKSHOT', 'SMALL', 1, 3, 'PRODUCT_MARKETING'), 
-(24, 'image ...', 'PM_IMG4', 'prod-1-img-1.png', 0, 'image 4', 1, 'PACKSHOT', 'SMALL', 1, 4, 'PRODUCT_MARKETING'), 
-(25, 'image ...', 'PM_IMG5', 'prod-1-img-1.png', 0, 'image 5', 1, 'BACKGROUND', null, 1, 1, 'PRODUCT_MARKETING'), 
-(26, 'image ...', 'PM_IMG6', 'prod-1-img-1.png', 0, 'image 6', 1, 'BACKGROUND', null, 1, 2, 'PRODUCT_MARKETING'), 
-(27, 'image ...', 'PM_IMG7', 'prod-1-img-1.png', 0, 'image 7', 1, 'BACKGROUND', null, 1, 3, 'PRODUCT_MARKETING'), 
-(28, 'image ...', 'PM_IMG8', 'prod-1-img-1.png', 0, 'image 8', 1, 'BACKGROUND', null, 1, 4, 'PRODUCT_MARKETING');
+(21, 'image ...', 'PM_IMG21', 'prod-1-img-1.png', 1, 'image l', 1, 'PACKSHOT', 'SMALL', 1, 1, 'PRODUCT_MARKETING'), 
+(22, 'image ...', 'PM_IMG22', 'prod-1-img-1.png', 0, 'image 2', 1, 'PACKSHOT', 'SMALL', 1, 2, 'PRODUCT_MARKETING'), 
+(23, 'image ...', 'PM_IMG23', 'prod-1-img-1.png', 0, 'image 3', 1, 'PACKSHOT', 'SMALL', 1, 3, 'PRODUCT_MARKETING'), 
+(24, 'image ...', 'PM_IMG24', 'prod-1-img-1.png', 0, 'image 4', 1, 'PACKSHOT', 'SMALL', 1, 4, 'PRODUCT_MARKETING'), 
+(25, 'image ...', 'PM_IMG25', 'prod-1-img-1.png', 0, 'image 5', 1, 'BACKGROUND', null, 1, 1, 'PRODUCT_MARKETING'), 
+(26, 'image ...', 'PM_IMG26', 'prod-1-img-1.png', 0, 'image 6', 1, 'BACKGROUND', null, 1, 2, 'PRODUCT_MARKETING'), 
+(27, 'image ...', 'PM_IMG27', 'prod-1-img-1.png', 0, 'image 7', 1, 'BACKGROUND', null, 1, 3, 'PRODUCT_MARKETING'), 
+(28, 'image ...', 'PM_IMG28', 'prod-1-img-1.png', 0, 'image 8', 1, 'BACKGROUND', null, 1, 4, 'PRODUCT_MARKETING'),
+--add
+(51, 'image ...', 'PM_IMG51', 'prod-1-img-1.png', 1, 'image 9', 1, 'PACKSHOT', 'SMALL', 1, 5, 'PRODUCT_MARKETING'), 
+(61, 'image ...', 'PM_IMG61', 'prod-1-img-1.png', 0, 'image 10', 1, 'PACKSHOT', 'SMALL', 1, 6, 'PRODUCT_MARKETING'), 
+(71, 'image ...', 'PM_IMG71', 'prod-1-img-1.png', 0, 'image 11', 1, 'PACKSHOT', 'SMALL', 1, 7, 'PRODUCT_MARKETING'), 
+(81, 'image ...', 'PM_IMG81', 'prod-1-img-1.png', 0, 'image 12', 1, 'PACKSHOT', 'SMALL', 1, 8, 'PRODUCT_MARKETING'),
+(91, 'image ...', 'PM_IMG91', 'prod-1-img-1.png', 1, 'image 13', 1, 'PACKSHOT', 'SMALL', 1, 9, 'PRODUCT_MARKETING'), 
+(101, 'image ...', 'PM_IMG101', 'prod-1-img-1.png', 0, 'image 14', 1, 'PACKSHOT', 'SMALL', 1, 10, 'PRODUCT_MARKETING'), 
+(111, 'image ...', 'PM_IMG111', 'prod-1-img-1.png', 0, 'image 15', 1, 'PACKSHOT', 'SMALL', 1, 11, 'PRODUCT_MARKETING'), 
+(121, 'image ...', 'PM_IMG121', 'prod-1-img-1.png', 0, 'image 16', 1, 'PACKSHOT', 'SMALL', 1, 12, 'PRODUCT_MARKETING'),
+(131, 'image ...', 'PM_IMG131', 'prod-1-img-1.png', 1, 'image 17', 1, 'PACKSHOT', 'SMALL', 1, 13, 'PRODUCT_MARKETING'), 
+(141, 'image ...', 'PM_IMG141', 'prod-1-img-1.png', 0, 'image 18', 1, 'PACKSHOT', 'SMALL', 1, 14, 'PRODUCT_MARKETING'),
+
+(52, 'image ...', 'PM_IMG52', 'prod-1-img-1.png', 0, 'image 19', 1, 'BACKGROUND', null, 1, 5, 'PRODUCT_MARKETING'), 
+(62, 'image ...', 'PM_IMG62', 'prod-1-img-1.png', 0, 'image 20', 1, 'BACKGROUND', null, 1, 6, 'PRODUCT_MARKETING'), 
+(72, 'image ...', 'PM_IMG72', 'prod-1-img-1.png', 0, 'image 21', 1, 'BACKGROUND', null, 1, 7, 'PRODUCT_MARKETING'), 
+(82, 'image ...', 'PM_IMG82', 'prod-1-img-1.png', 0, 'image 22', 1, 'BACKGROUND', null, 1, 8, 'PRODUCT_MARKETING'),
+(92, 'image ...', 'PM_IMG92', 'prod-1-img-1.png', 0, 'image 23', 1, 'BACKGROUND', null, 1, 9, 'PRODUCT_MARKETING'), 
+(102, 'image ...', 'PM_IMG102', 'prod-1-img-1.png', 0, 'image 24', 1, 'BACKGROUND', null, 1, 10, 'PRODUCT_MARKETING'), 
+(112, 'image ...', 'PM_IMG112', 'prod-1-img-1.png', 0, 'image 25', 1, 'BACKGROUND', null, 1, 11, 'PRODUCT_MARKETING'), 
+(122, 'image ...', 'PM_IMG122', 'prod-1-img-1.png', 0, 'image 26', 1, 'BACKGROUND', null, 1, 12, 'PRODUCT_MARKETING'),
+(132, 'image ...', 'PM_IMG132', 'prod-1-img-1.png', 0, 'image 27', 1, 'BACKGROUND', null, 1, 13, 'PRODUCT_MARKETING'), 
+(142, 'image ...', 'PM_IMG142', 'prod-1-img-1.png', 0, 'image 28', 1, 'BACKGROUND', null, 1, 14, 'PRODUCT_MARKETING');
 
 INSERT INTO teco_asset  
 (id, description, code, path, is_default, name, version, type, size, is_global, product_sku_id, scope)
  VALUES 
-(31, 'image ...', 'PS_IMG1', 'prod-1-img-1.png', 1, 'image l', 1, 'PACKSHOT', 'SMALL', 1, 1, 'PRODUCT_SKU'), 
-(32, 'image ...', 'PS_IMG2', 'prod-1-img-1.png', 0, 'image 2', 1, 'PACKSHOT', 'SMALL', 1, 2, 'PRODUCT_SKU'), 
-(33, 'image ...', 'PS_IMG3', 'prod-1-img-1.png', 0, 'image 3', 1, 'PACKSHOT', 'SMALL', 1, 3, 'PRODUCT_SKU'), 
-(34, 'image ...', 'PS_IMG4', 'prod-1-img-1.png', 0, 'image 4', 1, 'PACKSHOT', 'SMALL', 1, 4, 'PRODUCT_SKU'), 
-(35, 'image ...', 'PS_IMG5', 'prod-1-img-1.png', 0, 'image 5', 1, 'BACKGROUND', null, 1, 1, 'PRODUCT_SKU'), 
-(36, 'image ...', 'PS_IMG6', 'prod-1-img-1.png', 0, 'image 6', 1, 'BACKGROUND', null, 1, 2, 'PRODUCT_SKU'), 
-(37, 'image ...', 'PS_IMG7', 'prod-1-img-1.png', 0, 'image 7', 1, 'BACKGROUND', null, 1, 3, 'PRODUCT_SKU'), 
-(38, 'image ...', 'PS_IMG8', 'prod-1-img-1.png', 0, 'image 8', 1, 'BACKGROUND', null, 1, 4, 'PRODUCT_SKU');
+(31, 'image ...', 'PS_IMG31', 'prod-1-img-1.png', 1, 'image l', 1, 'PACKSHOT', 'SMALL', 1, 1, 'PRODUCT_SKU'), 
+(32, 'image ...', 'PS_IMG32', 'prod-1-img-1.png', 0, 'image 2', 1, 'PACKSHOT', 'SMALL', 1, 2, 'PRODUCT_SKU'), 
+(33, 'image ...', 'PS_IMG33', 'prod-1-img-1.png', 0, 'image 3', 1, 'PACKSHOT', 'SMALL', 1, 3, 'PRODUCT_SKU'), 
+(34, 'image ...', 'PS_IMG34', 'prod-1-img-1.png', 0, 'image 4', 1, 'PACKSHOT', 'SMALL', 1, 4, 'PRODUCT_SKU'), 
+(35, 'image ...', 'PS_IMG35', 'prod-1-img-1.png', 0, 'image 5', 1, 'BACKGROUND', null, 1, 1, 'PRODUCT_SKU'), 
+(36, 'image ...', 'PS_IMG36', 'prod-1-img-1.png', 0, 'image 6', 1, 'BACKGROUND', null, 1, 2, 'PRODUCT_SKU'), 
+(37, 'image ...', 'PS_IMG37', 'prod-1-img-1.png', 0, 'image 7', 1, 'BACKGROUND', null, 1, 3, 'PRODUCT_SKU'), 
+(38, 'image ...', 'PS_IMG38', 'prod-1-img-1.png', 0, 'image 8', 1, 'BACKGROUND', null, 1, 4, 'PRODUCT_SKU');
 
+-- DELIVERY METHODS
+
+INSERT INTO teco_delivery_method  
+(id, code, name, description, version)
+ VALUES 
+(10, 'UPS', 'UPS', 'UPS', 1), 
+(20, 'CHONOPOST', 'Chronopost', 'Chronopost', 1), 
+(30, 'COLISSIMO', 'Collisimo', 'Collisimo', 1);
+
+INSERT INTO teco_market_area_delivery_method_rel  
+(market_area_id, delivery_method_id)
+ VALUES 
+(1, 10),
+(1, 20),
+(1, 30);
+
+INSERT INTO teco_delivery_method_price  
+(id, market_area_id, price, retailer_id, currency_id, delivery_method_id)
+VALUES 
+(10, 1, 14.35, 1, 150, 10),
+(20, 1, 15.35, 1, 150, 20),
+(30, 1, 16.35, 1, 150, 30);
 
 -- RULE | PROMO
 
-
+-- ORDER
+INSERT INTO teco_order_number  
+(id, last_order_number, version)
+VALUES 
+(1, 1000, 1);

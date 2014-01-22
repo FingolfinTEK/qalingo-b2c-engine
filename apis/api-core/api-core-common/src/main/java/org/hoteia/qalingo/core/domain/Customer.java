@@ -36,6 +36,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -45,7 +46,7 @@ import org.hoteia.qalingo.core.domain.enumtype.CustomerNetworkOrigin;
 import org.hoteia.qalingo.core.domain.enumtype.CustomerPlatformOrigin;
 
 @Entity
-@Table(name="TECO_CUSTOMER")
+@Table(name="TECO_CUSTOMER", uniqueConstraints = {@UniqueConstraint(columnNames= {"LOGIN", "EMAIL"})})
 public class Customer extends AbstractEntity {
 
 	/**
@@ -111,13 +112,19 @@ public class Customer extends AbstractEntity {
     @JoinColumn(name="CUSTOMER_ID")
 	private Set<CustomerCredential> credentials = new HashSet<CustomerCredential>(); 
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="CUSTOMER_ID")
-	private Set<CustomerAddress> addresses = new HashSet<CustomerAddress>(); 
-	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="CUSTOMER_ID")
-	private Set<CustomerConnectionLog> connectionLogs = new HashSet<CustomerConnectionLog>(); 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "CUSTOMER_ID")
+    private Set<CustomerAddress> addresses = new HashSet<CustomerAddress>();
+
+    @Column(name = "DEFAULT_SHIPPING_ADDRESS")
+    private Long defaultShippingAddressId;
+
+    @Column(name = "DEFAULT_BILLING_ADDRESS")
+    private Long defaultBillingAddressId;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "CUSTOMER_ID")
+    private Set<CustomerConnectionLog> connectionLogs = new HashSet<CustomerConnectionLog>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="CUSTOMER_ID")
@@ -142,6 +149,10 @@ public class Customer extends AbstractEntity {
     @JoinColumn(name="CUSTOMER_ID")
 	private Set<CustomerOAuth> oauthAccesses = new HashSet<CustomerOAuth>(); 
 	
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "CUSTOMER_ID")
+    private Set<CustomerPaymentInformation> paymentInformations = new HashSet<CustomerPaymentInformation>();
+	   
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="CUSTOMER_ID")
 	private CustomerOrderAudit customerOrderAudit;
@@ -353,7 +364,37 @@ public class Customer extends AbstractEntity {
 	public void setAddresses(Set<CustomerAddress> addresses) {
 		this.addresses = addresses;
 	}
-
+	
+	public Long getDefaultShippingAddressId() {
+        if(defaultShippingAddressId != null){
+            return defaultShippingAddressId;
+        } else {
+            if(getAddresses() != null){
+                return getAddresses().iterator().next().getId();
+            }
+        }
+        return null;
+    }
+	
+	public void setDefaultShippingAddressId(Long defaultShippingAddressId) {
+        this.defaultShippingAddressId = defaultShippingAddressId;
+    }
+	
+	public Long getDefaultBillingAddressId() {
+	    if(defaultBillingAddressId != null){
+	        return defaultBillingAddressId;
+	    } else {
+	        if(getAddresses() != null){
+	            return getAddresses().iterator().next().getId();
+	        }
+	    }
+	    return null;
+    }
+	
+	public void setDefaultBillingAddressId(Long defaultBillingAddressId) {
+        this.defaultBillingAddressId = defaultBillingAddressId;
+    }
+	
 	public Set<CustomerConnectionLog> getConnectionLogs() {
 		return connectionLogs;
 	}
@@ -405,6 +446,14 @@ public class Customer extends AbstractEntity {
 	
 	public void setOauthAccesses(Set<CustomerOAuth> oauthAccesses) {
 	    this.oauthAccesses = oauthAccesses;
+    }
+	
+	public Set<CustomerPaymentInformation> getPaymentInformations() {
+        return paymentInformations;
+    }
+	
+	public void setPaymentInformations(Set<CustomerPaymentInformation> paymentInformations) {
+        this.paymentInformations = paymentInformations;
     }
 	
 	public CustomerOrderAudit getCustomerOrderAudit() {
@@ -547,111 +596,51 @@ public class Customer extends AbstractEntity {
 		return (String) getValue(CustomerAttribute.CUSTOMER_ATTRIBUTE_SCREENAME, null, null);
 	}
 
-	@Override
+    @Override
     public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result + (active ? 1231 : 1237);
-	    result = prime * result + ((code == null) ? 0 : code.hashCode());
-	    result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
-	    result = prime * result + ((dateUpdate == null) ? 0 : dateUpdate.hashCode());
-	    result = prime * result + ((defaultLocale == null) ? 0 : defaultLocale.hashCode());
-	    result = prime * result + ((email == null) ? 0 : email.hashCode());
-	    result = prime * result + ((firstname == null) ? 0 : firstname.hashCode());
-	    result = prime * result + ((gender == null) ? 0 : gender.hashCode());
-	    result = prime * result + ((id == null) ? 0 : id.hashCode());
-	    result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
-	    result = prime * result + ((login == null) ? 0 : login.hashCode());
-	    result = prime * result + ((password == null) ? 0 : password.hashCode());
-	    result = prime * result + ((title == null) ? 0 : title.hashCode());
-	    result = prime * result + (validated ? 1231 : 1237);
-	    result = prime * result + version;
-	    return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((code == null) ? 0 : code.hashCode());
+        result = prime * result + ((email == null) ? 0 : email.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
     }
 
-	@Override
+    @Override
     public boolean equals(Object obj) {
-	    if (this == obj)
-		    return true;
-	    if (obj == null)
-		    return false;
-	    if (getClass() != obj.getClass())
-		    return false;
-	    Customer other = (Customer) obj;
-	    if (active != other.active)
-		    return false;
-	    if (code == null) {
-		    if (other.code != null)
-			    return false;
-	    } else if (!code.equals(other.code))
-		    return false;
-	    if (dateCreate == null) {
-		    if (other.dateCreate != null)
-			    return false;
-	    } else if (!dateCreate.equals(other.dateCreate))
-		    return false;
-	    if (dateUpdate == null) {
-		    if (other.dateUpdate != null)
-			    return false;
-	    } else if (!dateUpdate.equals(other.dateUpdate))
-		    return false;
-	    if (defaultLocale == null) {
-		    if (other.defaultLocale != null)
-			    return false;
-	    } else if (!defaultLocale.equals(other.defaultLocale))
-		    return false;
-	    if (email == null) {
-		    if (other.email != null)
-			    return false;
-	    } else if (!email.equals(other.email))
-		    return false;
-	    if (firstname == null) {
-		    if (other.firstname != null)
-			    return false;
-	    } else if (!firstname.equals(other.firstname))
-		    return false;
-	    if (gender == null) {
-		    if (other.gender != null)
-			    return false;
-	    } else if (!gender.equals(other.gender))
-		    return false;
-	    if (id == null) {
-		    if (other.id != null)
-			    return false;
-	    } else if (!id.equals(other.id))
-		    return false;
-	    if (lastname == null) {
-		    if (other.lastname != null)
-			    return false;
-	    } else if (!lastname.equals(other.lastname))
-		    return false;
-	    if (login == null) {
-		    if (other.login != null)
-			    return false;
-	    } else if (!login.equals(other.login))
-		    return false;
-	    if (password == null) {
-		    if (other.password != null)
-			    return false;
-	    } else if (!password.equals(other.password))
-		    return false;
-	    if (title == null) {
-		    if (other.title != null)
-			    return false;
-	    } else if (!title.equals(other.title))
-		    return false;
-	    if (validated != other.validated)
-		    return false;
-	    if (version != other.version)
-		    return false;
-	    return true;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Customer other = (Customer) obj;
+        if (code == null) {
+            if (other.code != null)
+                return false;
+        } else if (!code.equals(other.code))
+            return false;
+        if (email == null) {
+            if (other.email != null)
+                return false;
+        } else if (!email.equals(other.email))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
     }
 
-	@Override
+    @Override
     public String toString() {
-	    return "Customer [id=" + id + ", version=" + version + ", code=" + code + ", login=" + login + ", avatarImg=" + avatarImg + ", gender=" + gender + ", title=" + title + ", firstname=" + firstname + ", lastname="
-	            + lastname + ", email=" + email + ", password=" + password + ", defaultLocale=" + defaultLocale + ", active=" + active + ", validated=" + validated + ", dateCreate=" + dateCreate
-	            + ", dateUpdate=" + dateUpdate + "]";
+        return "Customer [id=" + id + ", version=" + version + ", code=" + code + ", login=" + login + ", avatarImg=" + avatarImg + ", permalink=" + permalink + ", gender=" + gender + ", title="
+                + title + ", firstname=" + firstname + ", lastname=" + lastname + ", email=" + email + ", password=" + password + ", defaultLocale=" + defaultLocale + ", active=" + active
+                + ", validated=" + validated + ", validationToken=" + validationToken + ", anonymous=" + anonymous + ", defaultShippingAddressId=" + defaultShippingAddressId
+                + ", defaultBillingAddressId=" + defaultBillingAddressId + ", platformOrigin=" + platformOrigin + ", networkOrigin=" + networkOrigin + ", dateCreate=" + dateCreate + ", dateUpdate="
+                + dateUpdate + "]";
     }
+
 
 }

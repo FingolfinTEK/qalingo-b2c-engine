@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.util.Assert;
@@ -51,7 +50,7 @@ public class ExtReloadableResourceBundleMessageSource extends ReloadableResource
 	}
 	
 	protected PropertiesHolder getSpecificProperties(String fileNamePattern, Locale locale) {
-		String fileName = "classpath:" + fileNamePattern + "_" + locale.getLanguage();
+		String fileName = "classpath:" + fileNamePattern + "_" + locale.toString();
 		PropertiesHolder propertiesHolder =  getProperties(fileName);
 		if(propertiesHolder == null){
 			fileName = "classpath:" + fileNamePattern;

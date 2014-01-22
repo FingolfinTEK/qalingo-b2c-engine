@@ -11,7 +11,6 @@ package org.hoteia.qalingo.core.domain;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -44,8 +43,8 @@ public class EngineSettingValue extends AbstractEntity {
 	@Column(name="VALUE")
 	private String value;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-    @JoinColumn(name="ENGINE_SETTING_ID")
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="ENGINE_SETTING_ID", insertable = true, updatable = true)
 	private EngineSetting engineSetting;
 	
 	@Temporal(TemporalType.TIMESTAMP)
@@ -106,5 +105,41 @@ public class EngineSettingValue extends AbstractEntity {
 	public void setDateUpdate(Date dateUpdate) {
 		this.dateUpdate = dateUpdate;
 	}
-	
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EngineSettingValue other = (EngineSettingValue) obj;
+        if (dateCreate == null) {
+            if (other.dateCreate != null)
+                return false;
+        } else if (!dateCreate.equals(other.dateCreate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "EngineSettingValue [id=" + id + ", context=" + context + ", value=" + value + ", dateCreate=" + dateCreate + ", dateUpdate=" + dateUpdate + "]";
+    }
+
 }

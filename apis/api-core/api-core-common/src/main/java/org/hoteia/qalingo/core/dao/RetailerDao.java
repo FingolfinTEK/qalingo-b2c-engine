@@ -42,15 +42,17 @@ public interface RetailerDao {
 
 	List<Retailer> findRetailersByText(Long marketAreaId, Long retailerId, String searchTxt);
 	
-	void saveOrUpdateRetailer(Retailer retailer);
+	Retailer saveOrUpdateRetailer(Retailer retailer);
 
 	void deleteRetailer(Retailer retailer);
 	
-	void saveOrUpdateRetailerCustomerRate(RetailerCustomerRate retailerCustomerRate);
+    // RETAILER COMMENT/RATE
+	
+	RetailerCustomerRate saveOrUpdateRetailerCustomerRate(RetailerCustomerRate retailerCustomerRate);
 	
 	void deleteRetailerCustomerRate(RetailerCustomerRate retailerCustomerRate);
 	
-	void saveOrUpdateRetailerCustomerComment(RetailerCustomerComment retailerCustomerComment);
+	RetailerCustomerComment saveOrUpdateRetailerCustomerComment(RetailerCustomerComment retailerCustomerComment);
 	
 	void deleteRetailerCustomerComment(RetailerCustomerComment retailerCustomerComment);
 	
@@ -62,7 +64,7 @@ public interface RetailerDao {
 	 
 	List<Store> findStores();
 	
-	void saveOrUpdateStore(Store store);
+	Store saveOrUpdateStore(Store store);
 
 	void deleteStore(Store store);
 

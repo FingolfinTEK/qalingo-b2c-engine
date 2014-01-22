@@ -31,28 +31,19 @@ public class CatalogDaoImpl extends AbstractGenericDaoImpl implements CatalogDao
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public CatalogMaster getProductCatalogById(final Long catalogMasterId) {
-        Criteria criteria = getSession().createCriteria(CatalogMaster.class);
+    // MASTER CATALOG
+
+    public CatalogMaster getMasterCatalogById(final Long masterCatalogId) {
+        Criteria criteria = createDefaultCriteria(CatalogMaster.class);
         addDefaultCatalogFetch(criteria);
-        criteria.add(Restrictions.eq("id", catalogMasterId));
+        criteria.add(Restrictions.eq("id", masterCatalogId));
         
         CatalogMaster catalogMaster = (CatalogMaster) criteria.uniqueResult();
         return catalogMaster;
 	}
-
-	public CatalogVirtual getCatalogVirtual(final Long marketAreaId) {
-        Criteria criteria = getSession().createCriteria(CatalogVirtual.class);
-        addDefaultCatalogFetch(criteria);
-        criteria.setFetchMode("catalogMaster", FetchMode.JOIN);
-        criteria.createAlias("marketArea", "ma", JoinType.LEFT_OUTER_JOIN);
-        criteria.add(Restrictions.eq("ma.id", marketAreaId));
-
-        CatalogVirtual catalogVirtual = (CatalogVirtual) criteria.uniqueResult();
-		return catalogVirtual;
-	}
-	
+    
     public List<CatalogMaster> findAllCatalogMasters() {
-        Criteria criteria = getSession().createCriteria(CatalogMaster.class);
+        Criteria criteria = createDefaultCriteria(CatalogMaster.class);
         addDefaultCatalogFetch(criteria);
         criteria.addOrder(Order.asc("id"));
 
@@ -60,21 +51,49 @@ public class CatalogDaoImpl extends AbstractGenericDaoImpl implements CatalogDao
         List<CatalogMaster> catalogMasters = criteria.list();
         return catalogMasters;
     }
-	
-	public void saveOrUpdateProductCatalog(final CatalogMaster catalogMaster) {
-		if(catalogMaster.getDateCreate() == null){
-			catalogMaster.setDateCreate(new Date());
-		}
-		catalogMaster.setDateUpdate(new Date());
-		if(catalogMaster.getId() == null){
-			em.persist(catalogMaster);
-		} else {
-			em.merge(catalogMaster);
-		}
-	}
+    
+    public CatalogMaster saveOrUpdateCatalogMaster(final CatalogMaster catalogMaster) {
+        if(catalogMaster.getDateCreate() == null){
+            catalogMaster.setDateCreate(new Date());
+        }
+        catalogMaster.setDateUpdate(new Date());
+        if (catalogMaster.getId() != null) {
+            if(em.contains(catalogMaster)){
+                em.refresh(catalogMaster);
+            }
+            CatalogMaster mergedCatalogMaster = em.merge(catalogMaster);
+            em.flush();
+            return mergedCatalogMaster;
+        } else {
+            em.persist(catalogMaster);
+            return catalogMaster;
+        }
+    }
+    
+    public void deleteCatalogMaster(final CatalogMaster catalogMaster) {
+        em.remove(catalogMaster);
+    }
+    
+    // VIRTUAL CATALOG
 
-	public void deleteProductCatalog(final CatalogMaster catalogMaster) {
-		em.remove(catalogMaster);
+    public CatalogVirtual getVirtualCatalogById(final Long virtualCatalogId) {
+        Criteria criteria = createDefaultCriteria(CatalogVirtual.class);
+        addDefaultCatalogFetch(criteria);
+        criteria.add(Restrictions.eq("id", virtualCatalogId));
+        
+        CatalogVirtual catalogVirtual = (CatalogVirtual) criteria.uniqueResult();
+        return catalogVirtual;
+    }
+    
+	public CatalogVirtual getVirtualCatalogByMarketAreaId(final Long marketAreaId) {
+        Criteria criteria = createDefaultCriteria(CatalogVirtual.class);
+        addDefaultCatalogFetch(criteria);
+        criteria.setFetchMode("catalogMaster", FetchMode.JOIN);
+        criteria.createAlias("marketArea", "ma", JoinType.LEFT_OUTER_JOIN);
+        criteria.add(Restrictions.eq("ma.id", marketAreaId));
+
+        CatalogVirtual catalogVirtual = (CatalogVirtual) criteria.uniqueResult();
+		return catalogVirtual;
 	}
 	
     private void addDefaultCatalogFetch(Criteria criteria) {

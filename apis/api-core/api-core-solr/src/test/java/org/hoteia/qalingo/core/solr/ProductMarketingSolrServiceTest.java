@@ -1,11 +1,20 @@
 package org.hoteia.qalingo.core.solr;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
+import org.hoteia.qalingo.core.domain.MarketArea;
 import org.hoteia.qalingo.core.domain.ProductMarketing;
+import org.hoteia.qalingo.core.domain.ProductSku;
+import org.hoteia.qalingo.core.domain.ProductSkuPrice;
+import org.hoteia.qalingo.core.domain.Retailer;
 import org.hoteia.qalingo.core.solr.response.ProductMarketingResponseBean;
 import org.hoteia.qalingo.core.solr.service.ProductMarketingSolrService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,16 +39,44 @@ public class ProductMarketingSolrServiceTest {
 
 	protected ProductMarketingResponseBean responseBean;
 
+    private MarketArea marketArea;
+    private Retailer retailer;
+    
+    @Before
+    public void setUp() throws Exception {
+        marketArea = new MarketArea();
+        marketArea.setId(new Long("1"));
+        
+        retailer = new Retailer();
+        retailer.setId(new Long("1"));
+        
+        productMarketing = new ProductMarketing();
+        productMarketing.setId(new Long("1"));
+        productMarketing.setBusinessName("Product Marketing");
+        productMarketing.setDescription("Product Marketing ...");
+        productMarketing.setCode("productMarketing");
+        
+        ProductSku productSku = new ProductSku();
+        productSku.setId(new Long("1"));
+        productSku.setDefault(true);
+        ProductSkuPrice productSkuPrice = new ProductSkuPrice();
+        productSkuPrice.setId(new Long("1"));
+        productSkuPrice.setMarketAreaId(new Long("1"));
+        productSkuPrice.setRetailerId(new Long("1"));
+        productSkuPrice.setSalePrice(new BigDecimal("2"));
+        productSku.getPrices().add(productSkuPrice);
+        productMarketing.getProductSkus().add(productSku);
+        
+    }
+    
     /**
      * Test Case to check: if required field is blank of null (i.e. id here)
      */
     @Test(expected = IllegalArgumentException.class)
     public void testIndexDataWithBlankID() throws SolrServerException, IOException {
-        productMarketing = new ProductMarketing();
-        productMarketing.setBusinessName("Product Marketing");
-        productMarketing.setDescription("Product Marketing ...");
-        productMarketing.setCode("productMarketing");
-        productMarketingSolrService.addOrUpdateProductMarketing(productMarketing);
+        productMarketing.setId(null);
+        List<CatalogCategoryVirtual> catalogCategories = new ArrayList<CatalogCategoryVirtual>();
+        productMarketingSolrService.addOrUpdateProductMarketing(productMarketing, catalogCategories, marketArea, retailer);
         logger.debug("--------------->testFirstIndexData()");
     }
     
@@ -49,12 +86,8 @@ public class ProductMarketingSolrServiceTest {
     @Test
     public void testIndexData() throws SolrServerException, IOException {
         logger.debug("--------------->testIndexData");
-        productMarketing = new ProductMarketing();
-        productMarketing.setId(Long.parseLong("91"));
-        productMarketing.setBusinessName("Product Marketing");
-        productMarketing.setDescription("Product Marketing ...");
-        productMarketing.setCode("productMarketing");
-        productMarketingSolrService.addOrUpdateProductMarketing(productMarketing);
+        List<CatalogCategoryVirtual> catalogCategories = new ArrayList<CatalogCategoryVirtual>();
+        productMarketingSolrService.addOrUpdateProductMarketing(productMarketing, catalogCategories, marketArea, retailer);
     }
     
 	/**

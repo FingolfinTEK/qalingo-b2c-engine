@@ -15,17 +15,19 @@ import org.hoteia.qalingo.core.domain.OrderCustomer;
 
 public interface OrderCustomerService {
 
+    OrderCustomer getOrderById(Long orderCustomerId);
+    
 	OrderCustomer getOrderById(String orderCustomerId);
 
-	OrderCustomer getOrderByCode(String code);
-
+	OrderCustomer getOrderByOrderNum(String orderNum);
+	
 	List<OrderCustomer> findOrders();
 	
 	List<OrderCustomer> findOrdersByCustomerId(String customerId);
 	
 	OrderCustomer createNewOrder(OrderCustomer orderCustomer);
 	
-	void updateOrder(OrderCustomer orderCustomer);
+	void saveOrUpdateOrder(OrderCustomer orderCustomer);
 	
 	void deleteOrder(OrderCustomer orderCustomer);
 

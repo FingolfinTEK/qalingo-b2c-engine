@@ -14,11 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.AbstractPaymentGateway;
 import org.hoteia.qalingo.core.domain.AbstractRuleReferential;
@@ -26,6 +21,7 @@ import org.hoteia.qalingo.core.domain.Asset;
 import org.hoteia.qalingo.core.domain.CatalogCategoryMaster;
 import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
 import org.hoteia.qalingo.core.domain.Customer;
+import org.hoteia.qalingo.core.domain.DeliveryMethod;
 import org.hoteia.qalingo.core.domain.EngineSetting;
 import org.hoteia.qalingo.core.domain.EngineSettingValue;
 import org.hoteia.qalingo.core.domain.Localization;
@@ -36,13 +32,14 @@ import org.hoteia.qalingo.core.domain.OrderCustomer;
 import org.hoteia.qalingo.core.domain.ProductMarketing;
 import org.hoteia.qalingo.core.domain.ProductSku;
 import org.hoteia.qalingo.core.domain.Retailer;
-import org.hoteia.qalingo.core.domain.Shipping;
 import org.hoteia.qalingo.core.domain.User;
 import org.hoteia.qalingo.core.domain.enumtype.BoUrls;
-import org.hoteia.qalingo.core.i18n.enumtype.I18nKeyValueUniverse;
-import org.hoteia.qalingo.core.i18n.enumtype.ScopeWebMessage;
 import org.hoteia.qalingo.core.pojo.RequestData;
 import org.hoteia.qalingo.core.service.BackofficeUrlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("backofficeUrlService")
 @Transactional
@@ -58,11 +55,11 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
 		final Retailer retailer = requestData.getMarketAreaRetailer();
 		
 		String url = buildDefaultPrefix(requestData) + BoUrls.CHANGE_LANGUAGE.getUrlWithoutWildcard() + "?";
-		url = url + RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE + "=" + handleString(marketPlace.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_CODE + "=" + handleString(market.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE + "=" + handleString(marketArea.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_RETAILER_CODE + "=" + handleString(retailer.getCode());
-        url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_LANGUAGE + "=" + handleString(localization.getCode());
+		url = url + RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE + "=" + replaceSpaceAndUnderscore(marketPlace.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_CODE + "=" + replaceSpaceAndUnderscore(market.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE + "=" + replaceSpaceAndUnderscore(marketArea.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_RETAILER_CODE + "=" + replaceSpaceAndUnderscore(retailer.getCode());
+        url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_LANGUAGE + "=" + replaceSpaceAndUnderscore(localization.getCode());
 		return url;
 	}
 	
@@ -74,11 +71,11 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
 		final Retailer retailer = requestData.getMarketAreaRetailer();
 		
 		String url = buildDefaultPrefix(requestData) + BoUrls.CHANGE_CONTEXT.getUrlWithoutWildcard() + "?";
-		url = url + RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE + "=" + handleString(marketPlace.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_CODE + "=" + handleString(market.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE + "=" + handleString(marketArea.getCode());
-		url = url + "&" + RequestConstants.REQUEST_PARAMETER_RETAILER_CODE + "=" + handleString(retailer.getCode());
-        url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_LANGUAGE + "=" + handleString(localization.getCode());
+		url = url + RequestConstants.REQUEST_PARAMETER_MARKET_PLACE_CODE + "=" + replaceSpaceAndUnderscore(marketPlace.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_CODE + "=" + replaceSpaceAndUnderscore(market.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_CODE + "=" + replaceSpaceAndUnderscore(marketArea.getCode());
+		url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_RETAILER_CODE + "=" + replaceSpaceAndUnderscore(retailer.getCode());
+        url = url + "&" + RequestConstants.REQUEST_PARAMETER_MARKET_AREA_LANGUAGE + "=" + replaceSpaceAndUnderscore(localization.getCode());
 		return url;
 	}
 	
@@ -97,56 +94,56 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
                     if (param == null) continue;
                     if (param instanceof CatalogCategoryMaster) {
                         CatalogCategoryMaster catalogCategoryMaster = (CatalogCategoryMaster) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE, handleParamValue(catalogCategoryMaster.getCode()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE, handleParamValue(catalogCategoryMaster.getCode()));
                         break;
                     } else if (param instanceof CatalogCategoryVirtual) {
                         CatalogCategoryVirtual catalogCategoryVirtual = (CatalogCategoryVirtual) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE, handleParamValue(catalogCategoryVirtual.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE, handleParamValue(catalogCategoryVirtual.getCode().toString()));
                         break;
                     } else if (param instanceof ProductMarketing) {
                         ProductMarketing productMarketing = (ProductMarketing) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_MARKETING_CODE, handleParamValue(productMarketing.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_MARKETING_CODE, handleParamValue(productMarketing.getCode().toString()));
                         break;
                     } else if (param instanceof ProductSku) {
                         ProductSku productSku = (ProductSku) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_SKU_CODE, handleParamValue(productSku.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PRODUCT_SKU_CODE, handleParamValue(productSku.getCode().toString()));
                         break;
                     } else if (param instanceof Asset) {
                         Asset asset = (Asset) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_ASSET_CODE, handleParamValue(asset.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ASSET_CODE, handleParamValue(asset.getCode().toString()));
                         break;
                     } else if (param instanceof AbstractRuleReferential) {
                         AbstractRuleReferential rule = (AbstractRuleReferential) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_RULE_CODE, handleParamValue(rule.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_RULE_CODE, handleParamValue(rule.getCode().toString()));
                         break;
-                    } else if (param instanceof Shipping) {
-                        Shipping shipping = (Shipping) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_SHIPPING_CODE, handleParamValue(shipping.getId().toString()));
+                    } else if (param instanceof DeliveryMethod) {
+                        DeliveryMethod shipping = (DeliveryMethod) param;
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_DELIVERY_METHOD_CODE, handleParamValue(shipping.getCode().toString()));
                         break;
                     } else if (param instanceof OrderCustomer) {
                         OrderCustomer order = (OrderCustomer) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_ORDER_CODE, handleParamValue(order.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ORDER_NUM, handleParamValue(order.getOrderNum().toString()));
                         break;
                     } else if (param instanceof Customer) {
                         Customer customer = (Customer) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_CUSTOMER_CODE, handleParamValue(customer.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_CUSTOMER_CODE, handleParamValue(customer.getCode().toString()));
                         break;
                     } else if (param instanceof EngineSetting) {
                         EngineSetting engineSetting = (EngineSetting) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_ID, handleParamValue(engineSetting.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_GUID, handleParamValue(engineSetting.getCode().toString()));
                         break;
                     } else if (param instanceof EngineSettingValue) {
                         EngineSettingValue engineSettingValue = (EngineSettingValue) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_VALUE_ID, handleParamValue(engineSettingValue.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_ENGINE_SETTING_VALUE_GUID, handleParamValue(engineSettingValue.getId().toString()));
                         break;
                     } else if (param instanceof AbstractPaymentGateway) {
                         AbstractPaymentGateway paymentGateway = (AbstractPaymentGateway) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_PAYMENT_GATEWAY_ID, handleParamValue(paymentGateway.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_PAYMENT_GATEWAY_GUID, handleParamValue(paymentGateway.getCode().toString()));
                         break;
                     } else if (param instanceof User
                             && !url.equals(BoUrls.PERSONAL_DETAILS) && !url.equals(BoUrls.PERSONAL_EDIT)) {
                         User user = (User) param;
-                        getParams.put(RequestConstants.REQUEST_PARAMETER_USER_ID, handleParamValue(user.getId().toString()));
+                        getParams.put(RequestConstants.REQUEST_PARAMETER_USER_GUID, handleParamValue(user.getId().toString()));
                         break;
                     } else if (param instanceof Map) {
                         getParams = (Map<String, String>) param;
@@ -179,7 +176,7 @@ public class BackofficeUrlServiceImpl extends AbstractUrlServiceImpl implements 
     }
     
     @Override
-    protected String getSeoSegmentMain(Locale locale) throws Exception{
+    public String getSeoSegmentMain(Locale locale) throws Exception{
         return "";
     }
     

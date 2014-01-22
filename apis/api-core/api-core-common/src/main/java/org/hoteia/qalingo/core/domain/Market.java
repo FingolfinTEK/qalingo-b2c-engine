@@ -27,12 +27,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import org.apache.commons.lang.StringUtils;
 
 @Entity
-@Table(name="TECO_MARKET")
+@Table(name="TECO_MARKET", uniqueConstraints = {@UniqueConstraint(columnNames= {"CODE"})})
 public class Market extends AbstractEntity {
 
 	/**
@@ -67,7 +68,7 @@ public class Market extends AbstractEntity {
     private String theme;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MARKETPLACE_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "MARKETPLACE_ID", insertable = true, updatable = true)
     private MarketPlace marketPlace;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -226,81 +227,47 @@ public class Market extends AbstractEntity {
         return null;
     }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		result = prime * result
-				+ ((dateCreate == null) ? 0 : dateCreate.hashCode());
-		result = prime * result
-				+ ((dateUpdate == null) ? 0 : dateUpdate.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (isDefault ? 1231 : 1237);
-		result = prime * result
-				+ ((marketAreas == null) ? 0 : marketAreas.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + version;
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((code == null) ? 0 : code.hashCode());
+        result = prime * result + ((dateCreate == null) ? 0 : dateCreate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Market other = (Market) obj;
-		if (code == null) {
-			if (other.code != null)
-				return false;
-		} else if (!code.equals(other.code))
-			return false;
-		if (dateCreate == null) {
-			if (other.dateCreate != null)
-				return false;
-		} else if (!dateCreate.equals(other.dateCreate))
-			return false;
-		if (dateUpdate == null) {
-			if (other.dateUpdate != null)
-				return false;
-		} else if (!dateUpdate.equals(other.dateUpdate))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (isDefault != other.isDefault)
-			return false;
-		if (marketAreas == null) {
-			if (other.marketAreas != null)
-				return false;
-		} else if (!marketAreas.equals(other.marketAreas))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (version != other.version)
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Market other = (Market) obj;
+        if (code == null) {
+            if (other.code != null)
+                return false;
+        } else if (!code.equals(other.code))
+            return false;
+        if (dateCreate == null) {
+            if (other.dateCreate != null)
+                return false;
+        } else if (!dateCreate.equals(other.dateCreate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
 
-	@Override
+    @Override
     public String toString() {
-	    return "Market [id=" + id + ", version=" + version + ", name=" + name + ", description=" + description + ", isDefault=" + isDefault + ", code=" + code + ", theme=" + theme + ", marketPlace="
-	            + marketPlace + ", marketAreas=" + marketAreas + ", dateCreate=" + dateCreate + ", dateUpdate=" + dateUpdate + "]";
+        return "Market [id=" + id + ", version=" + version + ", name=" + name + ", description=" + description + ", isDefault=" + isDefault + ", code=" + code + ", theme=" + theme + ", dateCreate="
+                + dateCreate + ", dateUpdate=" + dateUpdate + "]";
     }
 
 }

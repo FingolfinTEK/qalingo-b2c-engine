@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
-import org.hoteia.qalingo.core.Constants;
+import org.hoteia.qalingo.core.ModelConstants;
 import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.CatalogCategoryMaster;
 import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
@@ -86,8 +86,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final MarketArea currentMarketArea = requestData.getMarketArea();
         final Locale locale = requestData.getLocale();
 
-		CatalogVirtual catalogVirtual = catalogService.getCatalogVirtual(currentMarketArea.getId());
-		final CatalogMaster catalogMaster = catalogVirtual.getCatalogMaster();
+        final CatalogMaster catalogMaster = catalogService.getMasterCatalogById(currentMarketArea.getCatalog().getCatalogMaster().getId());
 
 		final String pageKey = BoUrls.MASTER_CATALOG_KEY;
 		final String title = getSpecificMessage(ScopeWebMessage.SEO, getMessageTitleKey(pageKey), locale);
@@ -95,11 +94,14 @@ public class CatalogController extends AbstractBusinessBackofficeController {
 
 		List<CatalogCategoryMaster> catalogCategories = catalogCategoryService.findRootMasterCatalogCategories(currentMarketArea.getId());
 		CatalogViewBean catalogViewBean = backofficeViewBeanFactory.buildMasterCatalogViewBean(requestUtil.getRequestData(request), catalogMaster, catalogCategories);
-		modelAndView.addObject(Constants.CATALOG_VIEW_BEAN, catalogViewBean);
+		modelAndView.addObject(ModelConstants.CATALOG_VIEW_BEAN, catalogViewBean);
 
+		// TODO : Denis : FIND A BETTER WAY - CLEAN ENTITY GRAPH FOR DOZER - EVICT LAZY EXCEPTION
+		catalogMaster.setCatalogCategories(null);
+		
         ObjectMapper mapper = new ObjectMapper();
         try {
-            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getCatalog(catalogMaster);
+            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getMasterCatalog(catalogMaster);
             String catalog = mapper.writeValueAsString(catalogPojo);
             modelAndView.addObject("catalogJson", catalog);
         } catch (JsonGenerationException e) {
@@ -120,7 +122,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final MarketArea currentMarketArea = requestData.getMarketArea();
         final Locale locale = requestData.getLocale();
 		
-		CatalogVirtual catalogVirtual = catalogService.getCatalogVirtual(currentMarketArea.getId());
+		CatalogVirtual catalogVirtual = catalogService.getVirtualCatalogbyMarketAreaId(currentMarketArea.getId());
 
 		final String pageKey = BoUrls.VIRTUAL_CATALOG_KEY;
 		final String title = getSpecificMessage(ScopeWebMessage.SEO, getMessageTitleKey(pageKey), locale);
@@ -128,11 +130,11 @@ public class CatalogController extends AbstractBusinessBackofficeController {
 		
 		List<CatalogCategoryVirtual> catalogCategories = catalogCategoryService.findRootVirtualCatalogCategories(currentMarketArea.getId());
 		CatalogViewBean catalogViewBean = backofficeViewBeanFactory.buildVirtualCatalogViewBean(requestUtil.getRequestData(request), catalogVirtual, catalogCategories);
-		modelAndView.addObject(Constants.CATALOG_VIEW_BEAN, catalogViewBean);
+		modelAndView.addObject(ModelConstants.CATALOG_VIEW_BEAN, catalogViewBean);
 		
         ObjectMapper mapper = new ObjectMapper();
         try {
-            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getCatalog(catalogVirtual);
+            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getVirtualCatalog(catalogVirtual);
             String catalog = mapper.writeValueAsString(catalogPojo);
             modelAndView.addObject("catalogJson", catalog);
         } catch (JsonGenerationException e) {
@@ -152,7 +154,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final MarketArea currentMarketArea = requestData.getMarketArea();
         final Locale locale = requestData.getLocale();
         
-		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 
 		final CatalogCategoryMaster catalogCategory = catalogCategoryService.getMasterCatalogCategoryByCode(currentMarketArea.getId(), catalogCategoryCode);
 
@@ -173,7 +175,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final Localization currentLocalization = requestData.getMarketAreaLocalization();
         final Locale locale = requestData.getLocale();
         
-		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 		final CatalogCategoryMaster catalogCategory = catalogCategoryService.getMasterCatalogCategoryByCode(currentMarketArea.getId(), catalogCategoryCode);
 
 		List<CatalogCategoryMaster> categories = catalogCategoryService.findMasterCategoriesByMarketIdAndRetailerId(currentMarketArea.getId());
@@ -212,7 +214,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final Localization currentLocalization = requestData.getMarketAreaLocalization();
         final Locale locale = requestData.getLocale();
 
-		final String parentCatalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String parentCatalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 		
 		List<CatalogCategoryMaster> categories = catalogCategoryService.findMasterCategoriesByMarketIdAndRetailerId(currentMarketArea.getId());
 		Collections.sort(categories, new Comparator<CatalogCategoryMaster>() {
@@ -410,7 +412,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final MarketArea currentMarketArea = requestData.getMarketArea();
 		final Locale locale = requestData.getLocale();
 
-		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 
 		final CatalogCategoryVirtual catalogCategory = catalogCategoryService.getVirtualCatalogCategoryByCode(currentMarketArea.getId(), catalogCategoryCode);
 
@@ -431,7 +433,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final Localization currentLocalization = requestData.getMarketAreaLocalization();
         final Locale locale = requestData.getLocale();
 
-		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String catalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 		final CatalogCategoryVirtual catalogCategory = catalogCategoryService.getVirtualCatalogCategoryByCode(currentMarketArea.getId(), catalogCategoryCode);
 
 		List<CatalogCategoryMaster> categories = catalogCategoryService.findMasterCategoriesByMarketIdAndRetailerId(currentMarketArea.getId());
@@ -470,7 +472,7 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final Localization currentLocalization = requestData.getMarketAreaLocalization();
         final Locale locale = requestData.getLocale();
 
-		final String parentCatalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_PRODUCT_CATEGORY_CODE);
+		final String parentCatalogCategoryCode = request.getParameter(RequestConstants.REQUEST_PARAMETER_CATALOG_CATEGORY_CODE);
 		
 		List<CatalogCategoryMaster> categories = catalogCategoryService.findMasterCategoriesByMarketIdAndRetailerId(currentMarketArea.getId());
 		Collections.sort(categories, new Comparator<CatalogCategoryMaster>() {
@@ -551,21 +553,16 @@ public class CatalogController extends AbstractBusinessBackofficeController {
      * 
      */
 	protected void initProductMasterCategoryModelAndView(final HttpServletRequest request, final ModelAndView modelAndView, final CatalogCategoryMaster catalogCategory) throws Exception {
-		
 		CatalogCategoryViewBean catalogCategoryViewBean = backofficeViewBeanFactory.buildMasterCatalogCategoryViewBean(requestUtil.getRequestData(request), catalogCategory, true);
-		
-		modelAndView.addObject(Constants.CATALOG_CATEGORY_VIEW_BEAN, catalogCategoryViewBean);
+		modelAndView.addObject(ModelConstants.CATALOG_CATEGORY_VIEW_BEAN, catalogCategoryViewBean);
 	}
-	
 	
 	/**
      * 
      */
 	protected void initProductVirtualCategoryModelAndView(final HttpServletRequest request, final ModelAndView modelAndView, final CatalogCategoryVirtual catalogCategory) throws Exception {
-		
 		CatalogCategoryViewBean catalogCategoryViewBean = backofficeViewBeanFactory.buildVirtualCatalogCategoryViewBean(requestUtil.getRequestData(request), catalogCategory, true);
-		
-		modelAndView.addObject(Constants.CATALOG_CATEGORY_VIEW_BEAN, catalogCategoryViewBean);
+		modelAndView.addObject(ModelConstants.CATALOG_CATEGORY_VIEW_BEAN, catalogCategoryViewBean);
 	}
 	
 }

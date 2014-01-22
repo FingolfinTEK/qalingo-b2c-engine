@@ -12,14 +12,19 @@ package org.hoteia.qalingo.core.service;
 import java.util.List;
 
 import org.hoteia.qalingo.core.domain.Asset;
+import org.hoteia.qalingo.core.domain.ProductBrand;
 import org.hoteia.qalingo.core.domain.ProductMarketing;
 import org.hoteia.qalingo.core.domain.ProductSku;
+import org.hoteia.qalingo.core.domain.ProductMarketingCustomerComment;
+import org.hoteia.qalingo.core.domain.ProductMarketingCustomerRate;
 
 public interface ProductService {
 
     // PRODUCT MARKETING
     
-	ProductMarketing getProductMarketingById(String productMarketingId);
+    ProductMarketing getProductMarketingById(Long productMarketingId);
+
+    ProductMarketing getProductMarketingById(String productMarketingId);
 
 	ProductMarketing getProductMarketingByCode(String productMarketingCode);
 	
@@ -30,14 +35,30 @@ public interface ProductService {
     List<ProductMarketing> findProductMarketingsByBrandId(Long marketAreaId, Long brandId);
 
     List<ProductMarketing> findProductMarketingsByBrandCode(Long marketAreaId, String brandCode);
-
+    
+    List<ProductMarketing> findProductMarketingsByCatalogCategoryCode(Long marketAreaId,String categoryCode);
+    
+    List<ProductBrand> findProductBrandsByCatalogCategoryCode(String categoryCode);
+    
 	void saveOrUpdateProductMarketing(ProductMarketing productMarketing);
 	
 	void deleteProductMarketing(ProductMarketing productMarketing);
 
+    // PRODUCT MARKETING COMMENT/RATE
+    
+    void saveOrUpdateProductMarketingCustomerRate(ProductMarketingCustomerRate productMarketingCustomerRate);
+    
+    void deleteProductMarketingCustomerRate(ProductMarketingCustomerRate productMarketingCustomerRate);
+    
+    void saveOrUpdateProductMarketingCustomerComment(ProductMarketingCustomerComment productMarketingCustomerComment);
+    
+    void deleteProductMarketingCustomerComment(ProductMarketingCustomerComment productMarketingCustomerComment);
+    
 	// PRODUCT MARKETING ASSET
 	
-	Asset getProductMarketingAssetById(String productMarketingId);
+    Asset getProductMarketingAssetById(Long assetId);
+    
+	Asset getProductMarketingAssetById(String assetId);
 
 	Asset getProductMarketingAssetByCode(String assetCode);
 
@@ -46,6 +67,8 @@ public interface ProductService {
 	void deleteProductMarketingAsset(Asset productMarketingAsset);
 
     // PRODUCT SKU
+    
+    ProductSku getProductSkuById(Long productSkuId);
     
     ProductSku getProductSkuById(String productSkuId);
     
@@ -61,7 +84,9 @@ public interface ProductService {
     
     // PRODUCT SKU ASSET
     
-    Asset getProductSkuAssetById(String productSkuId);
+    Asset getProductSkuAssetById(Long assetId);
+    
+    Asset getProductSkuAssetById(String assetId);
 
     Asset getProductSkuAssetByCode(String assetCode);
 
@@ -69,4 +94,16 @@ public interface ProductService {
     
     void deleteProductSkuAsset(Asset productSkuAsset);
     
+    // PRODUCT BRAND
+    
+    ProductBrand getProductBrandById(Long productBrandId);
+
+    ProductBrand getProductBrandById(String productBrandId);
+
+    ProductBrand getProductBrandByCode(Long marketAreaId, String productBrandCode);
+
+    void saveOrUpdateProductBrand(ProductBrand productBrand);
+
+    void deleteProductBrand(ProductBrand productBrand);
+
 }
