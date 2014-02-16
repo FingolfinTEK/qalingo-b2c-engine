@@ -35,6 +35,11 @@ public final class ModelConstants {
     public static final String SEO_PAGE_META_KEYWORDS       = "seoPageMetaKeywords";
     public static final String SEO_PAGE_META_DESCIPRTION    = "seoPageMetaDescription";
     public static final String SEO_PAGE_META_TITLE          = "seoPageTitle";
+
+    public static final String PAGE_META_OG_TITLE       = "metaOgTitle";
+    public static final String PAGE_META_OG_DESCRIPTION = "metaOgDescription";
+    public static final String PAGE_META_OG_IMAGE       = "metaOgImage";
+
     public static final String MAIN_CONTENT_TITLE           = "mainContentTitle";
 
     // CHECKOUT PROCESS
@@ -90,6 +95,10 @@ public final class ModelConstants {
     public static final String PRODUCT_BRANDS_VIEW_BEAN             = "productBrands";
     public static final String RECENT_PPRODUCT_MARKETING_VIEW_BEAN  = "recentProducts";
     public static final String RELATED_PPRODUCT_MARKETING_VIEW_BEAN = "relatedProductMarketings";
+    public static final String CUSTOMER_PRODUCT_RATES_VIEW_BEAN = "customerProductRates";
+    
+    public static final String PRODUCT_COMMENT_FORM_BEAN = "productCommentForm";
+    public static final String PRODUCT_COMMENT_SUBMIT_URL = "productCommentUrl";
 
     public static final String ASSET_VIEW_BEAN                  = "asset";
 
@@ -139,6 +148,11 @@ public final class ModelConstants {
     public static final String RETAILERS_BY_RATIO_QUALITY_PRICE = "retailersByRatioQualityPrice";
     public static final String LAST_RETAILERS                   = "lastRetailers";
 
+    // GEOLOC
+    public static final String GEOLOC_REMOTE_ADDRESS    = "geolocRemoteAddress";
+    public static final String GEOLOC_COUNTRY           = "geolocCountry";
+    public static final String GEOLOC_CITY              = "geolocCity";
+    
     // OTHERS
     public static final String HEADER_CART      = "headerCart";
     public static final String HEADER_TITLE     = "headerTitle";

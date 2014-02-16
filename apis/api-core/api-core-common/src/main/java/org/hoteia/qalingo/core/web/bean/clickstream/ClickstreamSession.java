@@ -1,4 +1,4 @@
-package org.hoteia.qalingo.core.web.clickstream;
+package org.hoteia.qalingo.core.web.bean.clickstream;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class ClickstreamSession implements Serializable {
     private String initialReferrer;
     private boolean isBot;
     
-    private List<ClickstreamRequest> requests = Collections.synchronizedList(new ArrayList());
+    private List<ClickstreamRequest> requests = Collections.synchronizedList(new ArrayList<ClickstreamRequest>());
 
     public ClickstreamSession() {
     }

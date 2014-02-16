@@ -258,31 +258,37 @@ public class ViewBeanFactoryImpl extends AbstractViewBeanFactory implements View
         FooterMenuViewBean footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "conditionsofuse", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.CONDITIONS_OF_USE, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_CUSTOMER_CARE);
         footerMenuViewBeans.add(footerMenuList);
 
         footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "legal_terms", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.LEGAL_TERMS, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_OUR_COMPANY);
         footerMenuViewBeans.add(footerMenuList);
 
         footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "faq", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.FAQ, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_CUSTOMER_CARE);
         footerMenuViewBeans.add(footerMenuList);
 
         footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "store_location", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.STORE_LOCATION, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_CUSTOMER_CARE);
         footerMenuViewBeans.add(footerMenuList);
 
         footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "contactus", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.CONTACT, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_OUR_COMPANY);
         footerMenuViewBeans.add(footerMenuList);
 
         footerMenuList = new FooterMenuViewBean();
         footerMenuList.setName(getSpecificMessage(ScopeWebMessage.HEADER_MENU, "followus", locale));
         footerMenuList.setUrl(urlService.generateUrl(FoUrls.FOLLOW_US, requestData));
+        footerMenuList.setType(FooterMenuViewBean.MENU_TYPE_OUR_COMPANY);
         footerMenuViewBeans.add(footerMenuList);
 
         return footerMenuViewBeans;
@@ -1255,7 +1261,7 @@ public class ViewBeanFactoryImpl extends AbstractViewBeanFactory implements View
             for (Iterator<ProductAssociationLink> iterator = productAssociationLinks.iterator(); iterator.hasNext();) {
                 final ProductAssociationLink productAssociationLink = (ProductAssociationLink) iterator.next();
                 if (productAssociationLink.getType().equals(ProductAssociationLinkType.CROSS_SELLING)) {
-                    final ProductMarketing reloadedAssociatedProductMarketing = productService.getProductMarketingByCode(productAssociationLink.getProductMarketing().getCode());
+                    final ProductMarketing reloadedAssociatedProductMarketing = productService.getProductMarketingByCode(productAssociationLink.getProductSku().getProductMarketing().getCode());
                     productMarketingViewBean.getProductAssociationLinks().add(buildProductAssociationLinkViewBean(requestData, catalogCategory, reloadedAssociatedProductMarketing));
                 }
             }
@@ -1295,13 +1301,15 @@ public class ViewBeanFactoryImpl extends AbstractViewBeanFactory implements View
             for (Iterator<ProductAssociationLink> iterator = productAssociationLinks.iterator(); iterator.hasNext();) {
                 final ProductAssociationLink productAssociationLink = (ProductAssociationLink) iterator.next();
                 if (productAssociationLink.getType().equals(ProductAssociationLinkType.CROSS_SELLING)) {
-                    final ProductMarketing reloadedAssociatedProductMarketing = productService.getProductMarketingByCode(productAssociationLink.getProductMarketing().getCode());
+                    final ProductMarketing reloadedAssociatedProductMarketing = productService.getProductMarketingByCode(productAssociationLink.getProductSku().getProductMarketing().getCode());
                     productMarketingViewBean.getProductAssociationLinks().add(buildProductAssociationLinkViewBean(requestData, catalogCategory, reloadedAssociatedProductMarketing));
                 }
             }
         }
 
         productMarketingViewBean.setFeatured(productMarketing.isFeatured());
+        
+        productMarketingViewBean.setCustomerProductRates(productService.calculateProductMarketingCustomerRatesByProductCode(productMarketing.getId()));
 
         return productMarketingViewBean;
     }

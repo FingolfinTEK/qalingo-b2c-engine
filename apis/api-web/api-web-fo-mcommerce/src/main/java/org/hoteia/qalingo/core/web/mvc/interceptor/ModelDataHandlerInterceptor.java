@@ -18,6 +18,7 @@ import org.hoteia.qalingo.core.domain.MarketArea;
 import org.hoteia.qalingo.core.domain.MarketPlace;
 import org.hoteia.qalingo.core.pojo.RequestData;
 import org.hoteia.qalingo.core.service.EngineSessionService;
+import org.hoteia.qalingo.core.service.GeolocService;
 import org.hoteia.qalingo.core.web.mvc.factory.FrontofficeViewBeanFactory;
 import org.hoteia.qalingo.core.web.mvc.viewbean.CatalogCategoryViewBean;
 import org.hoteia.qalingo.core.web.util.RequestUtil;
@@ -39,6 +40,9 @@ public class ModelDataHandlerInterceptor implements HandlerInterceptor {
 
     @Autowired
     protected EngineSessionService engineSessionService;
+    
+    @Autowired
+    protected GeolocService geolocService;
     
     @Override
     public boolean preHandle(HttpServletRequest request, 
@@ -128,8 +132,15 @@ public class ModelDataHandlerInterceptor implements HandlerInterceptor {
             final List<CatalogCategoryViewBean> catalogCategoryViewBeans = frontofficeViewBeanFactory.buildListRootCatalogCategories(requestUtil.getRequestData(request), currentMarketArea);
             modelAndView.getModelMap().put(ModelConstants.CATALOG_CATEGORIES_VIEW_BEAN, catalogCategoryViewBeans);
 
+            // GEOLOC
+            if(requestData.getGeolocData() != null){
+                modelAndView.getModelMap().put(ModelConstants.GEOLOC_REMOTE_ADDRESS, requestData.getGeolocData().getRemoteAddress());
+                modelAndView.getModelMap().put(ModelConstants.GEOLOC_COUNTRY, requestData.getGeolocData().getCountry());
+                modelAndView.getModelMap().put(ModelConstants.GEOLOC_CITY, requestData.getGeolocData().getCity());
+            }
+            
         } catch (Exception e) {
-            logger.error("inject common datas failed", e);
+            logger.error("Inject common datas failed", e);
         }
         
     }

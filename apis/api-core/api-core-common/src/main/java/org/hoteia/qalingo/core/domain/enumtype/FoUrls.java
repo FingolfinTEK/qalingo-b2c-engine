@@ -96,7 +96,7 @@ public enum FoUrls {
     VELOCITY_CACHE(FoUrls.VELOCITY_CACHE_URL, FoUrls.VELOCITY_CACHE_KEY, FoUrls.VELOCITY_CACHE_VELOCITY_PAGE, true);
 
     public static final String PREHOME_KEY             = "prehome";
-    public static final String PREHOME_URL             = "/prehome.html";
+    public static final String PREHOME_URL             = "/**/prehome.html";
     public static final String PREHOME_VELOCITY_PAGE   = "prehome";
 
     public static final String HOME_KEY				= "home";
@@ -261,9 +261,9 @@ public enum FoUrls {
 	public static final String PRODUCT_DETAILS_VELOCITY_PAGE		= "catalog/product-details";
 
     public static final String PRODUCT_COMMENT_KEY                  = "product-comment";
-    public static final String PRODUCT_COMMENT_URL                  = "/**/product-comment-{" + RequestConstants.URL_PATTERN_RETAILER_CODE + ":[a-zA-Z0-9]+}.html";
+    public static final String PRODUCT_COMMENT_URL                  = "/**/product-comment-{" + RequestConstants.URL_PATTERN_PRODUCT_MARKETING_CODE + ":[a-zA-Z0-9]+}.html";
     public static final String PRODUCT_COMMENT_VELOCITY_PAGE        = "product/product-comment";
-    public static final String PRODUCT_VOTE_URL                     = "/**/product-vote-{" + RequestConstants.URL_PATTERN_RETAILER_CODE + ":[a-zA-Z0-9]+}.html";
+    public static final String PRODUCT_VOTE_URL                     = "/**/product-vote-{" + RequestConstants.URL_PATTERN_PRODUCT_MARKETING_CODE + ":[a-zA-Z0-9]+}.html";
 
 	public static final String WISHLIST_ADD_PRODUCT_KEY				= "add-to-wishlist";
 	public static final String WISHLIST_ADD_PRODUCT_URL				= "/**/add-to-wishlist.html";

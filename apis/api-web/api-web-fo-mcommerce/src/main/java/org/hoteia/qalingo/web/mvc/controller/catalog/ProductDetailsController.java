@@ -12,11 +12,9 @@ package org.hoteia.qalingo.web.mvc.controller.catalog;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hoteia.qalingo.core.Constants;
 import org.hoteia.qalingo.core.ModelConstants;
 import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
@@ -28,20 +26,25 @@ import org.hoteia.qalingo.core.service.CatalogCategoryService;
 import org.hoteia.qalingo.core.service.ProductService;
 import org.hoteia.qalingo.core.web.mvc.viewbean.CatalogBreadcrumbViewBean;
 import org.hoteia.qalingo.core.web.mvc.viewbean.CatalogCategoryViewBean;
+import org.hoteia.qalingo.core.web.mvc.viewbean.CustomerProductRatesViewBean;
 import org.hoteia.qalingo.core.web.mvc.viewbean.ProductMarketingViewBean;
 import org.hoteia.qalingo.core.web.servlet.ModelAndViewThemeDevice;
 import org.hoteia.qalingo.web.mvc.controller.AbstractMCommerceController;
+import org.hoteia.qalingo.web.mvc.form.ProductCommentForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 
  */
 @Controller("productDetailsController")
+@SessionAttributes
 public class ProductDetailsController extends AbstractMCommerceController {
 
 	@Autowired
@@ -53,7 +56,8 @@ public class ProductDetailsController extends AbstractMCommerceController {
 	@RequestMapping(FoUrls.PRODUCT_DETAILS_URL)
 	public ModelAndView productDetails(final HttpServletRequest request, final HttpServletResponse response ,final Model model, @PathVariable(RequestConstants.URL_PATTERN_CATEGORY_CODE) final String categoryCode,
 			 						   @PathVariable(RequestConstants.URL_PATTERN_PRODUCT_MARKETING_CODE) final String productMarketingCode,
-			 						   @PathVariable(RequestConstants.URL_PATTERN_PRODUCT_SKU_CODE) final String productSkuCode) throws Exception {
+			 						   @PathVariable(RequestConstants.URL_PATTERN_PRODUCT_SKU_CODE) final String productSkuCode,
+			 						   @ModelAttribute(ModelConstants.PRODUCT_COMMENT_FORM_BEAN) ProductCommentForm productCommentForm) throws Exception {
 		ModelAndViewThemeDevice modelAndView = new ModelAndViewThemeDevice(getCurrentVelocityPath(request), FoUrls.PRODUCT_DETAILS.getVelocityPage());
         final RequestData requestData = requestUtil.getRequestData(request);
         final MarketArea currentMarketArea = requestData.getMarketArea();
@@ -83,46 +87,21 @@ public class ProductDetailsController extends AbstractMCommerceController {
 
         //for now, get the featured products in same category
         //TODO: define related products
-        List<ProductMarketingViewBean> relatedProducts = catalogCategoryViewBean.getFeaturedProductMarketings();
+        final List<ProductMarketingViewBean> relatedProducts = catalogCategoryViewBean.getFeaturedProductMarketings();
         model.addAttribute(ModelConstants.RELATED_PPRODUCT_MARKETING_VIEW_BEAN, relatedProducts);
-
-        // TODO : Denis : move this part, Cookie, in RequestUtilImpl.java
-        Cookie info=null;
-        Cookie[] cookies = request.getCookies();
-        Boolean found = false;
-        if(cookies !=  null){
-	        for(int i=0;i<cookies.length;i++)
-	        {
-	            info=cookies[i];
-	            if(Constants.COOKIE_RECENT_PRODUCT_COOKIE_NAME.equals(info.getName()))
-	            {
-	                found = true;
-	                break;
-	            }
-	        }
-        }   
-        if(found){
-        	Boolean flag = false;
-        	String[] splits = info.getValue().split(" ");
-        	for(String value:splits){
-        		if(value.equals(Long.toString(productMarketing.getId()))){
-        			flag = true;
-        		} 
-        	}
-        	if(!flag){
-        		String values = info.getValue();
-        		values += " "+ Long.toString(productMarketing.getId());
-        		info.setValue(values);
-        		info.setPath("/");
-    			response.addCookie(info);
-        	} 
-        } else {
-			info = new Cookie(Constants.COOKIE_RECENT_PRODUCT_COOKIE_NAME, Long.toString(productMarketing.getId()));
-			info.setMaxAge(Constants.COOKIES_LENGTH);
-			info.setPath("/");
-			info.setDomain("fo-mcommerce.dev.qalingo.com");
-			response.addCookie(info);
+        
+        final CustomerProductRatesViewBean customerProductRatesViewBean = productService.getProductMarketingCustomerRateDetails(productMarketing.getId());
+        model.addAttribute(ModelConstants.CUSTOMER_PRODUCT_RATES_VIEW_BEAN, customerProductRatesViewBean);
+        
+        //Check if has authorized user
+        if(requestData.getCustomer() != null){
+	        productCommentForm = formFactory.buildProductCommentForm(requestData, productMarketing);
+	        model.addAttribute(ModelConstants.PRODUCT_COMMENT_FORM_BEAN, productCommentForm);
+	        model.addAttribute(ModelConstants.PRODUCT_COMMENT_SUBMIT_URL, urlService.generateUrl(FoUrls.PRODUCT_COMMENT, requestData, productMarketing));
         }
+        
+        requestUtil.addOrUpdateRecentProductToCookie(productMarketing.getId(), request, response);
+        
         return modelAndView;
 	}
 
