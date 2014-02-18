@@ -61,6 +61,7 @@ import org.hoteia.qalingo.core.i18n.enumtype.ScopeCommonMessage;
 import org.hoteia.qalingo.core.i18n.enumtype.ScopeReferenceDataMessage;
 import org.hoteia.qalingo.core.i18n.enumtype.ScopeWebMessage;
 import org.hoteia.qalingo.core.pojo.RequestData;
+import org.hoteia.qalingo.core.pojo.catalog.CatalogPojo;
 import org.hoteia.qalingo.core.service.BackofficeUrlService;
 import org.hoteia.qalingo.core.web.mvc.factory.BackofficeViewBeanFactory;
 import org.hoteia.qalingo.core.web.mvc.viewbean.AssetViewBean;
@@ -162,8 +163,7 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
      */
     public List<MarketViewBean> buildMarketViewBeansByMarketPlace(final RequestData requestData, final MarketPlace marketPlace, final List<Market> markets) throws Exception {
         List<MarketViewBean> marketViewBeans = new ArrayList<MarketViewBean>();
-        for (Iterator<Market> iteratorMarket = markets.iterator(); iteratorMarket.hasNext();) {
-            final Market marketNavigation = (Market) iteratorMarket.next();
+        for (final Market marketNavigation : markets) {
             marketViewBeans.add(buildMarketViewBean(requestData, marketNavigation));
         }
         return marketViewBeans;
@@ -175,8 +175,7 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
      */
     public List<MarketAreaViewBean> buildMarketAreaViewBeansByMarket(final RequestData requestData, final Market market, final List<MarketArea> marketAreas) throws Exception {
         List<MarketAreaViewBean> marketAreaViewBeans = new ArrayList<MarketAreaViewBean>();
-        for (Iterator<MarketArea> iteratorMarketArea = marketAreas.iterator(); iteratorMarketArea.hasNext();) {
-            final MarketArea marketArea = (MarketArea) iteratorMarketArea.next();
+        for (final MarketArea marketArea : marketAreas) {
             marketAreaViewBeans.add(buildMarketAreaViewBean(requestData, marketArea));
         }
         return marketAreaViewBeans;
@@ -214,8 +213,7 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
     public List<LocalizationViewBean> buildLocalizationViewBeansByMarketArea(final RequestData requestData, final List<Localization> localizations) throws Exception {
         final List<LocalizationViewBean> localizationViewBeans = new ArrayList<LocalizationViewBean>();
         if (localizations != null) {
-            for (Iterator<Localization> iterator = localizations.iterator(); iterator.hasNext();) {
-                Localization localization = (Localization) iterator.next();
+            for (Localization localization : localizations) {
                 localizationViewBeans.add(buildLocalizationViewBeanByMarketArea(requestData, localization));
             }
         }
@@ -229,8 +227,7 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
     public List<LocalizationViewBean> buildLocalizationViewBeans(final RequestData requestData, final List<Localization> localizations) throws Exception {
         final List<LocalizationViewBean> localizationViewBeans = new ArrayList<LocalizationViewBean>();
         if (localizations != null) {
-            for (Iterator<Localization> iterator = localizations.iterator(); iterator.hasNext();) {
-                Localization localization = (Localization) iterator.next();
+            for (Localization localization : localizations) {
                 localizationViewBeans.add(buildLocalizationViewBean(requestData, localization));
             }
         }
@@ -353,7 +350,7 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
      * @throws Exception
      * 
      */
-    public CatalogViewBean buildVirtualCatalogViewBean(final RequestData requestData, final CatalogVirtual catalogVirtual, final List<CatalogCategoryVirtual> catalogCategories) throws Exception {
+    public CatalogViewBean buildVirtualCatalogViewBean(final RequestData requestData, final CatalogPojo catalogVirtual, final List<CatalogCategoryVirtual> catalogCategories) throws Exception {
         final CatalogViewBean catalogViewBean = new CatalogViewBean();
         catalogViewBean.setBusinessName(catalogVirtual.getBusinessName());
         catalogViewBean.setCode(catalogVirtual.getCode());
@@ -363,7 +360,6 @@ public class BackofficeViewBeanFactoryImpl extends ViewBeanFactoryImpl implement
         }
 
         catalogViewBean.setAddRootCategoryUrl(backofficeUrlService.generateUrl(BoUrls.VIRTUAL_CATEGORY_ADD, requestData));
-
         return catalogViewBean;
     }
 

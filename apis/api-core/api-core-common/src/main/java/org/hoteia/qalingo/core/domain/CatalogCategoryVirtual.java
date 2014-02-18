@@ -165,10 +165,7 @@ public class CatalogCategoryVirtual extends AbstractEntity {
     }
 
     public boolean isRoot() {
-        if (getDefaultParentCatalogCategory() == null) {
-            return true;
-        }
-        return false;
+        return getDefaultParentCatalogCategory() == null;
     }
 
     public CatalogCategoryVirtual getDefaultParentCatalogCategory() {
@@ -198,8 +195,7 @@ public class CatalogCategoryVirtual extends AbstractEntity {
     public List<CatalogCategoryVirtualAttribute> getCatalogCategoryGlobalAttributes() {
         List<CatalogCategoryVirtualAttribute> catalogCategoryGlobalAttributes = new ArrayList<CatalogCategoryVirtualAttribute>();
         if (catalogCategoryAttributes != null) {
-            for (Iterator<CatalogCategoryVirtualAttribute> iterator = catalogCategoryAttributes.iterator(); iterator.hasNext();) {
-                CatalogCategoryVirtualAttribute attribute = (CatalogCategoryVirtualAttribute) iterator.next();
+            for (CatalogCategoryVirtualAttribute attribute : catalogCategoryAttributes) {
                 AttributeDefinition attributeDefinition = attribute.getAttributeDefinition();
                 if (attributeDefinition != null && attributeDefinition.isGlobal()) {
                     catalogCategoryGlobalAttributes.add(attribute);
@@ -212,8 +208,7 @@ public class CatalogCategoryVirtual extends AbstractEntity {
     public List<CatalogCategoryVirtualAttribute> getCatalogCategoryMarketAreaAttributes(Long marketAreaId) {
         List<CatalogCategoryVirtualAttribute> catalogCategoryMarketAreaAttributes = new ArrayList<CatalogCategoryVirtualAttribute>();
         if (catalogCategoryAttributes != null) {
-            for (Iterator<CatalogCategoryVirtualAttribute> iterator = catalogCategoryAttributes.iterator(); iterator.hasNext();) {
-                CatalogCategoryVirtualAttribute attribute = (CatalogCategoryVirtualAttribute) iterator.next();
+            for (CatalogCategoryVirtualAttribute attribute : catalogCategoryAttributes) {
                 AttributeDefinition attributeDefinition = attribute.getAttributeDefinition();
                 if (attributeDefinition != null && !attributeDefinition.isGlobal()) {
                     catalogCategoryMarketAreaAttributes.add(attribute);
@@ -270,8 +265,7 @@ public class CatalogCategoryVirtual extends AbstractEntity {
     public List<Asset> getAssetsIsGlobal() {
         List<Asset> assetsIsGlobal = new ArrayList<Asset>();
         if (assets != null) {
-            for (Iterator<Asset> iterator = assets.iterator(); iterator.hasNext();) {
-                Asset asset = (Asset) iterator.next();
+            for (Asset asset : assets) {
                 if (asset != null && asset.isGlobal()) {
                     assetsIsGlobal.add(asset);
                 }
@@ -283,8 +277,7 @@ public class CatalogCategoryVirtual extends AbstractEntity {
     public List<Asset> getAssetsByMarketArea() {
         List<Asset> assetsIsGlobal = new ArrayList<Asset>();
         if (assets != null) {
-            for (Iterator<Asset> iterator = assets.iterator(); iterator.hasNext();) {
-                Asset asset = (Asset) iterator.next();
+            for (Asset asset : assets) {
                 if (asset != null && !asset.isGlobal()) {
                     assetsIsGlobal.add(asset);
                 }

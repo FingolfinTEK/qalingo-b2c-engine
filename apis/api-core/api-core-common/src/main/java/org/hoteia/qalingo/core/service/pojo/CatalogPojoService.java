@@ -18,4 +18,5 @@ public interface CatalogPojoService {
 
     CatalogPojo getVirtualCatalog(CatalogVirtual catalogVirtual);
 
+    CatalogPojo getVirtualCatalogByMarketAreaId(Long id);
 }

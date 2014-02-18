@@ -93,6 +93,7 @@ public class CatalogDaoImpl extends AbstractGenericDaoImpl implements CatalogDao
         criteria.add(Restrictions.eq("ma.id", marketAreaId));
 
         CatalogVirtual catalogVirtual = (CatalogVirtual) criteria.uniqueResult();
+        catalogVirtual.getCatalogCategories();
 		return catalogVirtual;
 	}
 	

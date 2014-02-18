@@ -9,7 +9,6 @@
  */
 package org.hoteia.qalingo.web.mvc.controller.catalog;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,7 +25,6 @@ import org.hoteia.qalingo.core.RequestConstants;
 import org.hoteia.qalingo.core.domain.CatalogCategoryMaster;
 import org.hoteia.qalingo.core.domain.CatalogCategoryVirtual;
 import org.hoteia.qalingo.core.domain.CatalogMaster;
-import org.hoteia.qalingo.core.domain.CatalogVirtual;
 import org.hoteia.qalingo.core.domain.Localization;
 import org.hoteia.qalingo.core.domain.MarketArea;
 import org.hoteia.qalingo.core.domain.Retailer;
@@ -55,8 +53,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -101,14 +97,10 @@ public class CatalogController extends AbstractBusinessBackofficeController {
 		
         ObjectMapper mapper = new ObjectMapper();
         try {
-            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getMasterCatalog(catalogMaster);
+            CatalogPojo catalogPojo = catalogPojoService.getMasterCatalog(catalogMaster);
             String catalog = mapper.writeValueAsString(catalogPojo);
             modelAndView.addObject("catalogJson", catalog);
-        } catch (JsonGenerationException e) {
-            logger.error(e.getMessage());
-        } catch (JsonMappingException e) {
-            logger.error(e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 		
@@ -121,8 +113,8 @@ public class CatalogController extends AbstractBusinessBackofficeController {
         final RequestData requestData = requestUtil.getRequestData(request);
         final MarketArea currentMarketArea = requestData.getMarketArea();
         final Locale locale = requestData.getLocale();
-		
-		CatalogVirtual catalogVirtual = catalogService.getVirtualCatalogbyMarketAreaId(currentMarketArea.getId());
+
+        CatalogPojo catalogVirtual = catalogPojoService.getVirtualCatalogByMarketAreaId(currentMarketArea.getId());
 
 		final String pageKey = BoUrls.VIRTUAL_CATALOG_KEY;
 		final String title = getSpecificMessage(ScopeWebMessage.SEO, getMessageTitleKey(pageKey), locale);
@@ -134,14 +126,9 @@ public class CatalogController extends AbstractBusinessBackofficeController {
 		
         ObjectMapper mapper = new ObjectMapper();
         try {
-            CatalogPojo catalogPojo = (CatalogPojo) catalogPojoService.getVirtualCatalog(catalogVirtual);
-            String catalog = mapper.writeValueAsString(catalogPojo);
+            String catalog = mapper.writeValueAsString(catalogVirtual);
             modelAndView.addObject("catalogJson", catalog);
-        } catch (JsonGenerationException e) {
-            logger.error(e.getMessage());
-        } catch (JsonMappingException e) {
-            logger.error(e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
         return modelAndView;

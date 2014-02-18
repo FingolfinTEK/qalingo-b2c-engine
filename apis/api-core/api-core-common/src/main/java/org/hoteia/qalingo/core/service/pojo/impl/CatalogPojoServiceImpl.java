@@ -59,6 +59,13 @@ public class CatalogPojoServiceImpl implements CatalogPojoService {
         return catalogPojo;
     }
 
+    @Override
+    public CatalogPojo getVirtualCatalogByMarketAreaId(Long id) {
+        final CatalogVirtual catalogVirtual = catalogService.getVirtualCatalogbyMarketAreaId(id);
+        logger.debug("Found catalog {} for market area id {}", catalogVirtual, id);
+        return getVirtualCatalog(catalogVirtual);
+    }
+
     public CatalogPojo getVirtualCatalog(final CatalogVirtual catalogVirtual) {
         final CatalogPojo catalogPojo = dozerBeanMapper.map(catalogVirtual, CatalogPojo.class);
         logger.debug("Load {} catalog", catalogVirtual.getCode());
